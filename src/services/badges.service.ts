@@ -20,7 +20,7 @@ export type ResponseBadge = {
 
 export class BadgesServices {
   private badges: ResponseBadge[] = [];
-  private helper: IBadgesHelper;
+  public helper: IBadgesHelper;
 
   constructor() {
     this.helper = new BadgesHelper();
@@ -213,7 +213,7 @@ export class BadgesServices {
           claimable: celoTransactionsTier ? badgeData.tier < celoTransactionsTier : false,
         });
         break;
-        
+
       case "Talent Protocol score":
         const talentScore = await this.helper.getTalentScore(eoas);
         let talentScoreTier = 0;
@@ -232,6 +232,29 @@ export class BadgesServices {
           claimableTier: talentScoreTier,
           claimable: talentScoreTier ? badgeData.tier < talentScoreTier : false,
         });
+        break;
+
+      case "Celo Votes":
+        const celoVotes = await this.helper.getCeloVotes(eoas);
+        let celoVotesTier = 0;
+        for (let i = badgeData.badge.badgeTiers.length - 1; i >= 0; i--) {
+          if (
+            celoVotes >= badgeData.badge.badgeTiers[i].metadata!.minValue
+          ) {
+            celoVotesTier = i + 1;
+            break;
+          }
+        }
+        this.badges.push({
+          ...badgeData.badge,
+          points: badgeData.points,
+          tier: badgeData.tier,
+          claimableTier: celoVotesTier,
+          claimable: celoVotesTier ? badgeData.tier < celoVotesTier : false,
+        });
+        break;
+
+      default:
         break;
     }
 

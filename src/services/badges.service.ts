@@ -14,9 +14,9 @@ export type ResponseBadge = {
   points: string;
   tier: string;
 } & Badge["badge"] & {
-    claimableTier: number | null;
-    claimable: boolean;
-  };
+  claimableTier: number | null;
+  claimable: boolean;
+};
 
 export class BadgesServices {
   private badges: ResponseBadge[] = [];
@@ -165,18 +165,18 @@ export class BadgesServices {
 
   private async updateBadgeDataForAccount(eoas: string[], badgeData: Badge) {
     switch (badgeData.badge.metadata!.name) {
-      case "OP Mainnet User":
-        const optimismTransactions =
-          await this.helper.getOptimisimTransactions(eoas);
+      case "Celo genesis":
+        const celoGenesis =
+          await this.helper.getCeloGenesis(eoas);
         if (!badgeData.badge.badgeTiers)
           throw new Error("No tiers found for badge");
-        let optimismTier = null;
+        let celoGenesisTier = 0;
         for (let i = badgeData.badge.badgeTiers.length - 1; i >= 0; i--) {
           if (
-            optimismTransactions >=
+            celoGenesis <=
             badgeData.badge.badgeTiers[i].metadata!.minValue
           ) {
-            optimismTier = i + 1;
+            celoGenesisTier = i + 1;
             break;
           }
         }
@@ -184,100 +184,24 @@ export class BadgesServices {
           ...badgeData.badge,
           points: badgeData.points,
           tier: badgeData.tier,
-          claimableTier: optimismTier,
-          claimable: optimismTier ? badgeData.tier < optimismTier : false,
+          claimableTier: celoGenesisTier,
+          claimable: celoGenesisTier ? badgeData.tier < celoGenesisTier : false,
         });
 
         break;
-      case "Base User":
-        const baseTransactions = await this.helper.getBaseTransactions(eoas);
+
+      case "Celo Transactions":
+        const celoTransactions =
+          await this.helper.getCeloTransactions(eoas);
         if (!badgeData.badge.badgeTiers)
           throw new Error("No tiers found for badge");
-        let baseTier = null;
+        let celoTransactionsTier = 0;
         for (let i = badgeData.badge.badgeTiers.length - 1; i >= 0; i--) {
           if (
-            baseTransactions >= badgeData.badge.badgeTiers[i].metadata!.minValue
-          ) {
-            baseTier = i + 1;
-            break;
-          }
-        }
-
-        this.badges.push({
-          ...badgeData.badge,
-          points: badgeData.points,
-          tier: badgeData.tier,
-          claimableTier: baseTier,
-          claimable: baseTier ? badgeData.tier < baseTier : false,
-        });
-        break;
-
-      case "Ethereum Sepolia User":
-        const sepoliaTransactions =
-          await this.helper.getSepoliaTransactions(eoas);
-
-        if (!badgeData.badge.badgeTiers)
-          throw new Error("No tiers found for badge");
-        let sepoliaTier = null;
-        for (let i = badgeData.badge.badgeTiers.length - 1; i >= 0; i--) {
-          if (
-            sepoliaTransactions >=
+            celoTransactions >=
             badgeData.badge.badgeTiers[i].metadata!.minValue
           ) {
-            sepoliaTier = i + 1;
-            break;
-          }
-        }
-
-        this.badges.push({
-          ...badgeData.badge,
-          points: badgeData.points,
-          tier: badgeData.tier,
-          claimableTier: sepoliaTier,
-          claimable: sepoliaTier ? badgeData.tier < sepoliaTier : false,
-        });
-        break;
-
-      case "Mode User":
-        const modeTransactions = await this.helper.getModeTransactions(eoas);
-
-        if (!badgeData.badge.badgeTiers)
-          throw new Error("No tiers found for badge");
-        let modeTier = null;
-        for (let i = badgeData.badge.badgeTiers.length - 1; i >= 0; i--) {
-          if (
-            modeTransactions >= badgeData.badge.badgeTiers[i].metadata!.minValue
-          ) {
-            modeTier = i + 1;
-            break;
-          }
-        }
-
-        this.badges.push({
-          ...badgeData.badge,
-          points: badgeData.points,
-          tier: badgeData.tier,
-          claimableTier: modeTier,
-          claimable: modeTier ? badgeData.tier < modeTier : false,
-        });
-        break;
-      case "Citizen":
-        let isCitizen = await this.helper.isCitizen(eoas);
-        this.badges.push({
-          ...badgeData.badge,
-          points: badgeData.points,
-          tier: badgeData.tier,
-          claimableTier: isCitizen ? 1 : null,
-          claimable: isCitizen ? badgeData.tier != 1 : false,
-        });
-        break;
-
-      case "Hold Nouns":
-        const countNouns = await this.helper.hasNouns(eoas);
-        let nounsTier = null;
-        for (let i = badgeData.badge.badgeTiers.length - 1; i >= 0; i--) {
-          if (countNouns >= badgeData.badge.badgeTiers[i].metadata!.minValue) {
-            nounsTier = i + 1;
+            celoTransactionsTier = i + 1;
             break;
           }
         }
@@ -285,57 +209,14 @@ export class BadgesServices {
           ...badgeData.badge,
           points: badgeData.points,
           tier: badgeData.tier,
-          claimableTier: nounsTier,
-          claimable: nounsTier ? badgeData.tier < nounsTier : false,
+          claimableTier: celoTransactionsTier,
+          claimable: celoTransactionsTier ? badgeData.tier < celoTransactionsTier : false,
         });
         break;
-
-      case "Giveth Donations Made":
-        const givethDonations = await this.helper.getGivethDonations(eoas);
-        let givethDonationsTier = null;
-        for (let i = badgeData.badge.badgeTiers.length - 1; i >= 0; i--) {
-          if (
-            givethDonations >= badgeData.badge.badgeTiers[i].metadata!.minValue
-          ) {
-            givethDonationsTier = i + 1;
-            break;
-          }
-        }
-        this.badges.push({
-          ...badgeData.badge,
-          points: badgeData.points,
-          tier: badgeData.tier,
-          claimableTier: givethDonationsTier,
-          claimable: givethDonationsTier
-            ? badgeData.tier < givethDonationsTier
-            : false,
-        });
-        break;
-
-      case "Gitcoin Donations Made":
-        const gitcoinDonations = await this.helper.getGitcoinDonations(eoas);
-        let gitcoinDonationsTier = null;
-        for (let i = badgeData.badge.badgeTiers.length - 1; i >= 0; i--) {
-          if (
-            gitcoinDonations >= badgeData.badge.badgeTiers[i].metadata!.minValue
-          ) {
-            gitcoinDonationsTier = i + 1;
-            break;
-          }
-        }
-        this.badges.push({
-          ...badgeData.badge,
-          points: badgeData.points,
-          tier: badgeData.tier,
-          claimableTier: gitcoinDonationsTier,
-          claimable: gitcoinDonationsTier
-            ? badgeData.tier < gitcoinDonationsTier
-            : false,
-        });
-        break;
+        
       case "Talent Protocol score":
         const talentScore = await this.helper.getTalentScore(eoas);
-        let talentScoreTier = null;
+        let talentScoreTier = 0;
         for (let i = badgeData.badge.badgeTiers.length - 1; i >= 0; i--) {
           if (
             talentScore >= badgeData.badge.badgeTiers[i].metadata!.minValue
@@ -352,17 +233,7 @@ export class BadgesServices {
           claimable: talentScoreTier ? badgeData.tier < talentScoreTier : false,
         });
         break;
-
-      case "Worldcoin Verification":
-        const isWorldcoinVerified = await this.helper.isWorldcoinVerified(eoas);
-        this.badges.push({
-          ...badgeData.badge,
-          points: badgeData.points,
-          tier: badgeData.tier,
-          claimableTier: isWorldcoinVerified ? 1 : null,
-          claimable: isWorldcoinVerified ? badgeData.tier != 1 : false,
-        });
-        break;
     }
+
   }
 }

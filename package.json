@@ -27,7 +27,8 @@
     "graphql": "^16.9.0",
     "http": "^0.0.1-security",
     "ioredis": "^5.4.1",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "viem": "^2.21.21"
   },
   "devDependencies": {
     "@graphprotocol/client-cli": "^3.0.3",

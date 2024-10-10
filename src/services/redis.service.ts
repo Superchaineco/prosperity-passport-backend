@@ -9,7 +9,11 @@ export class RedisService {
         }
 
         const data = await fetchFunction();
-        await redis.set(key, JSON.stringify(data), "EX", ttl);
+        if (ttl) {
+            await redis.set(key, JSON.stringify(data), "EX", ttl);
+        } else {
+            await redis.set(key, JSON.stringify(data));
+        }
         return data;
     }
 

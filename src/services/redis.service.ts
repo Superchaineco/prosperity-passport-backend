@@ -1,7 +1,7 @@
 import { redis } from "../utils/cache";
 
 export class RedisService {
-    public async getCachedDataWithCallback<T>(key: string, fetchFunction: () => Promise<T>, ttl: number): Promise<T> {
+    public async getCachedData<T>(key: string, fetchFunction: () => Promise<T>, ttl?: number): Promise<T> {
         const cachedData = await redis.get(key);
         if (cachedData) {
             console.info(`Cache hit for key: ${key}`);

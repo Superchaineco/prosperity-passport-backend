@@ -37,10 +37,7 @@
     "http": "^0.0.1-security",
     "ioredis": "^5.4.1",
     "morgan": "^1.10.0",
-    "siwe": "^2.3.2"
-  },
-  "engines": {
-    "node": ">=16"
+    "viem": "^2.21.21"
   },
   "devDependencies": {
     "@graphprotocol/client-cli": "^3.0.3",

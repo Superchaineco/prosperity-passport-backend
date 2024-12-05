@@ -3,20 +3,24 @@ import { superChainAccountService } from "../services/superChainAccount.service"
 import { callPimlicoAPI, getCurrentSponsorhipValue, relayTransaction } from "../services/sponsorship.service";
 
 export async function getBalance(req: Request, res: Response) {
-  const account = req.params.account as string;
+  // const account = req.params.account as string;
 
-  if (!account) {
-    return res.status(500).json({ error: "Invalid request" });
-  }
-  const superChainSmartAccount =
-    await superChainAccountService.getSuperChainSmartAccount(account);
-  const { relayedTransactions, maxRelayedTransactions } = await getCurrentSponsorhipValue(
-    account,
-    Number(superChainSmartAccount[3]),
-  );
+  // if (!account) {
+  //   return res.status(500).json({ error: "Invalid request" });
+  // }
+  // const superChainSmartAccount =
+  //   await superChainAccountService.getSuperChainSmartAccount(account);
+  // const { relayedTransactions, maxRelayedTransactions } = await getCurrentSponsorhipValue(
+  //   account,
+  //   Number(superChainSmartAccount[3]),
+  // );
+  // return res.status(200).json({
+  //   relayedTransactions,
+  //   maxRelayedTransactions,
+  // });
   return res.status(200).json({
-    relayedTransactions,
-    maxRelayedTransactions,
+    relayedTransactions: 0,
+    maxRelayedTransactions: 0,
   });
 }
 

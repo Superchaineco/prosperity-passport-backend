@@ -2,16 +2,12 @@ import { BaseBadgeStrategy } from "./badgeStrategy";
 import fs from "fs";
 import csv from "csv-parser";
 
-
 type CsvRow = {
-  Address: string;
+    Address: string;
+    ENS: string;
 };
 
-
-const SuperCohort0FileData = "src/data/superCohort0.csv";
-
-export class SuperCohort0Strategy extends BaseBadgeStrategy {
-
+export class CeloRegionalLeadStrategy extends BaseBadgeStrategy {
 
     private async loadCsvData(filePath: string): Promise<CsvRow[]> {
         return new Promise((resolve, reject) => {
@@ -24,17 +20,12 @@ export class SuperCohort0Strategy extends BaseBadgeStrategy {
     }
 
     async getValue(eoas: string[]): Promise<boolean> {
-        const csvData = await this.loadCsvData(SuperCohort0FileData);
-
+        const csvData = await this.loadCsvData("src/data/celoRegionalLead.csv");
         for (const eoa of eoas) {
-            const assistant = csvData.find((row) =>
-                row.Address
-                    ? row.Address.toLocaleLowerCase() === eoa.toLowerCase()
-                    : false,
-            );
-            if (assistant) {
-                return true;
-            }
+          const stewards = csvData.find((row) => row.Address.toLowerCase() === eoa.toLowerCase());
+          if (stewards) {
+            return true;
+          }
         }
         return false;
     }

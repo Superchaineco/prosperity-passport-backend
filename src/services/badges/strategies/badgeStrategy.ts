@@ -6,6 +6,8 @@ export interface BadgeStrategy {
 export abstract class BaseBadgeStrategy implements BadgeStrategy {
     abstract getValue(eoas: string[]): Promise<number | boolean>;
 
+    protected isDecending = false;
+
     async calculateTier(eoas: string[], badgeData: Badge): Promise<ResponseBadge> {
         const value = await this.getValue(eoas);
 
@@ -36,6 +38,16 @@ export abstract class BaseBadgeStrategy implements BadgeStrategy {
     protected calculateNumericTier(badgeData: Badge, value: number): number {
         const badgeTiers = badgeData.badge.badgeTiers;
         if (!badgeTiers) throw new Error('No tiers found for badge');
+
+        if(this.isDecending) {
+        for (let i = badgeTiers.length - 1; i >= 0; i--) {
+                if (value <= badgeTiers[i].metadata!.minValue) {
+                    return i + 1;
+                }
+            }
+            return 0;
+        }
+
 
         for (let i = badgeTiers.length - 1; i >= 0; i--) {
             if (value >= badgeTiers[i].metadata!.minValue) {

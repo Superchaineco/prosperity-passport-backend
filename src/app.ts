@@ -9,8 +9,12 @@ import authRouter from "./routes/auth";
 import { DOMAIN, ENV, ENVIRONMENTS, SESSION_SECRET } from "./config/superChain/constants";
 
 const app = express();
-console.debug("ENV", ENV);
+console.debug("ENV", ENV, DOMAIN);
 
+const cookieConfig: Session.CookieOptions = {
+  secure: ENV === ENVIRONMENTS.production,
+  sameSite: ENV === ENVIRONMENTS.production ? "none" : true,
+}
 
 app.use(cors({
   origin: DOMAIN,
@@ -19,14 +23,17 @@ app.use(cors({
 
 app.use(express.json());
 app.use(Session({
-  name: 'Super-account-SIWE',
+  name: 'Prosperity-passport-SIWE',
   secret: SESSION_SECRET,
-  resave: false,
+  resave: true,
   saveUninitialized: true,
-  cookie: { secure: ENV === ENVIRONMENTS.production,  sameSite: 'none' }
+  cookie: cookieConfig
 }));
 
-app.set('trust proxy', 1); 
+if (ENV === ENVIRONMENTS.production) {
+  console.log("Trust proxy");
+  app.set('trust proxy', 1);
+}
 app.use(morgan("tiny"));
 
 app.get("/", (req, res) => {

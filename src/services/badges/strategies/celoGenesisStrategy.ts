@@ -15,11 +15,11 @@ export class CeloGenesisStrategy extends BaseBadgeStrategy {
         try {
           const response = await axios.get(`https://explorer.celo.org/mainnet/api?module=account&action=txlist&address=${eoa}&sort=asc`);
           const transactions = response.data.result;
-          
+
           if (transactions.length > 0) {
             const olderTransaction = transactions[0];
             const txnTimestamp = Number(olderTransaction.timeStamp);
-            
+
             if (txnTimestamp < olderTxnTimestamp) {
               olderTxnTimestamp = txnTimestamp;
             }
@@ -28,8 +28,12 @@ export class CeloGenesisStrategy extends BaseBadgeStrategy {
           console.error(`Error fetching transactions for address ${eoa}:`, error);
         }
       }
-      return olderTxnTimestamp;
+      const date = new Date(olderTxnTimestamp * 1000);
+      return date.getUTCFullYear();
     };
     return redisService.getCachedDataWithCallback(cacheKey, fetchFunction);
   }
+
+
+  protected isDecending = true;
 }

@@ -2,17 +2,12 @@ import { BaseBadgeStrategy } from "./badgeStrategy";
 import fs from "fs";
 import csv from "csv-parser";
 
-
 type CsvRow = {
-  Address: string;
-  ENS: string;
+    Address: string;
+    ENS: string;
 };
 
-
-const CitizenFilePath = "src/data/citizen.csv";
-
-export class CitizenCheckStrategy extends BaseBadgeStrategy {
-
+export class CeloStewardsStrategy extends BaseBadgeStrategy {
 
     private async loadCsvData(filePath: string): Promise<CsvRow[]> {
         return new Promise((resolve, reject) => {
@@ -25,15 +20,10 @@ export class CitizenCheckStrategy extends BaseBadgeStrategy {
     }
 
     async getValue(eoas: string[]): Promise<boolean> {
-        const csvData = await this.loadCsvData(CitizenFilePath);
-
+        const csvData = await this.loadCsvData("src/data/celoStewards.csv");
         for (const eoa of eoas) {
-            const citizen = csvData.find((row) =>
-                row.Address
-                    ? row.Address.toLocaleLowerCase() === eoa.toLowerCase()
-                    : false,
-            );
-            if (citizen) {
+            const stewards = csvData.find((row) => row.Address.toLowerCase() === eoa.toLowerCase());
+            if (stewards) {
                 return true;
             }
         }

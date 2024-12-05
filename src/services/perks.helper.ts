@@ -12,35 +12,9 @@ export class PerksHelper {
         this.config = config;
     }
 
-    public async getRafflePerks(accountLevel: number): Promise<Perk> {
-        const cacheKey = `rafflePerks-${accountLevel}`;
-        const ttl = 1800; // 30 minutes
-
-        const fetchFunction = async () => {
-            const { contractAddress, functionAbi } = this.config.SuperChainRaffle;
-            const provider = new JsonRpcProvider(JSON_RPC_PROVIDER);
-            const contract = new ethers.Contract(contractAddress, functionAbi, provider);
-            const freeTicketsPerLevel: bigint[] = await contract.getFreeTicketsPerLevel();
-
-            if (accountLevel === 0) {
-                return {
-                    name: "SuperChainRaffle",
-                    value: 0,
-                };
-            }
-
-            const freeTickets = freeTicketsPerLevel[accountLevel - 1] ?? freeTicketsPerLevel[freeTicketsPerLevel.length - 1];
-            return {
-                name: "SuperChainRaffle",
-                value: Number(freeTickets),
-            };
-        };
-
-        return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, ttl);
-    }
 
     public getSponsorPerks(accountLevel: number): Perk {
-        
+
         const maxSponsorshipValue = sponsorshipValues.levels[accountLevel].relayTransactions;
 
         return {

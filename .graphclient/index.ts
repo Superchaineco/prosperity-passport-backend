@@ -1637,7 +1637,7 @@ export type ResolversParentTypes = ResolversObject<{
   _Meta_: _Meta_;
 }>;
 
-export type entityDirectiveArgs = { };
+export type entityDirectiveArgs = {};
 
 export type entityDirectiveResolver<Result, Parent, ContextType = MeshContext, Args = entityDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
@@ -1863,10 +1863,10 @@ const baseDir = pathModule.join(typeof __dirname === 'string' ? __dirname : '/',
 
 const importFn: ImportFn = <T>(moduleId: string) => {
   const relativeModuleId = (pathModule.isAbsolute(moduleId) ? pathModule.relative(baseDir, moduleId) : moduleId).split('\\').join('/').replace(baseDir + '/', '');
-  switch(relativeModuleId) {
+  switch (relativeModuleId) {
     case ".graphclient/sources/superchainsmartaccounts/introspectionSchema":
       return Promise.resolve(importedModule$0) as T;
-    
+
     default:
       return Promise.reject(new Error(`Cannot find module '${relativeModuleId}'.`));
   }
@@ -1883,53 +1883,53 @@ const rootStore = new MeshStore('.graphclient', new FsStoreStorageAdapter({
 
 export const rawServeConfig: YamlConfig.Config['serve'] = undefined as any
 export async function getMeshOptions(): Promise<GetMeshOptions> {
-const pubsub = new PubSub();
-const sourcesStore = rootStore.child('sources');
-const logger = new DefaultLogger("GraphClient");
-const cache = new (MeshCache as any)({
-      ...({} as any),
-      importFn,
-      store: rootStore.child('cache'),
-      pubsub,
-      logger,
-    } as any)
+  const pubsub = new PubSub();
+  const sourcesStore = rootStore.child('sources');
+  const logger = new DefaultLogger("GraphClient");
+  const cache = new (MeshCache as any)({
+    ...({} as any),
+    importFn,
+    store: rootStore.child('cache'),
+    pubsub,
+    logger,
+  } as any)
 
-const sources: MeshResolvedSource[] = [];
-const transforms: MeshTransform[] = [];
-const additionalEnvelopPlugins: MeshPlugin<any>[] = [];
-const superchainsmartaccountsTransforms = [];
-const additionalTypeDefs = [] as any[];
-const superchainsmartaccountsHandler = new GraphqlHandler({
-              name: "superchainsmartaccounts",
-              config: {"endpoint":ENV === ENVIRONMENTS.production ? `https://gateway.thegraph.com/api/${SUBGRAPH_API_KEY}/subgraphs/id/A8Hs1ciwnqsdR8owyFZ77GM5PEXpQBqUTEUpNcnUS6xt` : "https://api.studio.thegraph.com/query/72352/super-accounts/version/latest"},
-              baseDir,
-              cache,
-              pubsub,
-              store: sourcesStore.child("superchainsmartaccounts"),
-              logger: logger.child("superchainsmartaccounts"),
-              importFn,
-            });
-sources[0] = {
-          name: 'superchainsmartaccounts',
-          handler: superchainsmartaccountsHandler,
-          transforms: superchainsmartaccountsTransforms
-        }
-const additionalResolvers = [] as any[]
-const merger = new(BareMerger as any)({
-        cache,
-        pubsub,
-        logger: logger.child('bareMerger'),
-        store: rootStore.child('bareMerger')
-      })
-const documentHashMap = {
-        "392382040647e5b9bb2ca2c23fee993a7d819fff89d58458d4a3fee7714bb25f": GetUserBadgesDocument
-      }
-additionalEnvelopPlugins.push(usePersistedOperations({
-        getPersistedOperation(key) {
-          return documentHashMap[key];
-        },
-        ...{}
-      }))
+  const sources: MeshResolvedSource[] = [];
+  const transforms: MeshTransform[] = [];
+  const additionalEnvelopPlugins: MeshPlugin<any>[] = [];
+  const superchainsmartaccountsTransforms = [];
+  const additionalTypeDefs = [] as any[];
+  const superchainsmartaccountsHandler = new GraphqlHandler({
+    name: "superchainsmartaccounts",
+    config: { "endpoint": 'https://api.studio.thegraph.com/query/72352/prosperity-passport/version/latest' },
+    baseDir,
+    cache,
+    pubsub,
+    store: sourcesStore.child("superchainsmartaccounts"),
+    logger: logger.child("superchainsmartaccounts"),
+    importFn,
+  });
+  sources[0] = {
+    name: 'superchainsmartaccounts',
+    handler: superchainsmartaccountsHandler,
+    transforms: superchainsmartaccountsTransforms
+  }
+  const additionalResolvers = [] as any[]
+  const merger = new (BareMerger as any)({
+    cache,
+    pubsub,
+    logger: logger.child('bareMerger'),
+    store: rootStore.child('bareMerger')
+  })
+  const documentHashMap = {
+    "392382040647e5b9bb2ca2c23fee993a7d819fff89d58458d4a3fee7714bb25f": GetUserBadgesDocument
+  }
+  additionalEnvelopPlugins.push(usePersistedOperations({
+    getPersistedOperation(key) {
+      return documentHashMap[key];
+    },
+    ...{}
+  }))
 
   return {
     sources,
@@ -1943,15 +1943,15 @@ additionalEnvelopPlugins.push(usePersistedOperations({
     additionalEnvelopPlugins,
     get documents() {
       return [
-      {
-        document: GetUserBadgesDocument,
-        get rawSDL() {
-          return printWithCache(GetUserBadgesDocument);
-        },
-        location: 'GetUserBadgesDocument.graphql',
-        sha256Hash: '392382040647e5b9bb2ca2c23fee993a7d819fff89d58458d4a3fee7714bb25f'
-      }
-    ];
+        {
+          document: GetUserBadgesDocument,
+          get rawSDL() {
+            return printWithCache(GetUserBadgesDocument);
+          },
+          location: 'GetUserBadgesDocument.graphql',
+          sha256Hash: '392382040647e5b9bb2ca2c23fee993a7d819fff89d58458d4a3fee7714bb25f'
+        }
+      ];
     },
     fetchFn,
   };
@@ -1975,15 +1975,15 @@ export function getBuiltGraphClient(): Promise<MeshInstance> {
     if (pollingInterval) {
       setInterval(() => {
         getMeshOptions()
-        .then(meshOptions => getMesh(meshOptions))
-        .then(newMesh =>
-          meshInstance$.then(oldMesh => {
-            oldMesh.destroy()
-            meshInstance$ = Promise.resolve(newMesh)
-          })
-        ).catch(err => {
-          console.error("Mesh polling failed so the existing version will be used:", err);
-        });
+          .then(meshOptions => getMesh(meshOptions))
+          .then(newMesh =>
+            meshInstance$.then(oldMesh => {
+              oldMesh.destroy()
+              meshInstance$ = Promise.resolve(newMesh)
+            })
+          ).catch(err => {
+            console.error("Mesh polling failed so the existing version will be used:", err);
+          });
       }, pollingInterval)
     }
     meshInstance$ = getMeshOptions().then(meshOptions => getMesh(meshOptions)).then(mesh => {

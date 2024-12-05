@@ -27,9 +27,7 @@ class PerksService {
 
     private async getPerks(level: number): Promise<Perk[]> {
         const perks: Perk[] = [];
-        const rafflePerks = await this.perksHelper.getRafflePerks(level);
         const sponsorPerks = this.perksHelper.getSponsorPerks(level);
-        perks.push(rafflePerks);
         perks.push(sponsorPerks);
         return perks;
     }

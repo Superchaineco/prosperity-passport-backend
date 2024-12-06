@@ -13,6 +13,7 @@ import { redisService } from "./redis.service";
 import sponsorshipValues from "../data/sponsorship.values.json";
 import config from "../config";
 import { superChainAccountService } from "./superChainAccount.service";
+import { celo } from "viem/chains";
 
 type Txn = {
   gas: string;
@@ -40,13 +41,13 @@ export async function callPimlicoAPI({ jsonrpc, method, params, id }: any) {
   try {
     if (method === "eth_sendUserOperation") {
       const superChainAccount = await superChainAccountService.getAccountLevel(params[0].sender);
-      // const isAble = await isAbleToSponsor(params[0].sender, superChainAccount);
-      // if (!isAble) {
-      //   throw { message: "User is not able to sponsor" };
-      // }
+      const isAble = await isAbleToSponsor(params[0].sender, superChainAccount);
+      if (!isAble) {
+        throw { message: "User is not able to sponsor" };
+      }
     }
     const response = await axios.post(
-      `https://api.pimlico.io/v2/${config.constants.OPTIMISM_CHAIN_ID}/rpc`,
+      `https://api.pimlico.io/v2/${celo.id}/rpc`,
       {
         jsonrpc: "2.0",
         method: method,
@@ -85,8 +86,7 @@ export async function getTransactionsCount(
   const startBlock = await getBlockNumberFromTimestamp(startTime);
 
   try {
-    // const badgeTransactions = await getBadgeTransactions(startBlock, account);
-    const badgeTransactions = []
+    const badgeTransactions = await getBadgeTransactions(startBlock, account);
     const relayCount = await getRelayCount(account);
     return badgeTransactions.length + relayCount;
   } catch (error) {
@@ -127,7 +127,6 @@ export async function relayTransaction(
     };
     const relayResponse = await relay.sponsoredCall(request, GELATO_API_KEY);
     const taskId = relayResponse.taskId;
-    // If the update fails, it will not affect the transaction
     await updateRelayCount(account).catch((error) => {
       console.error("Error updating relay count:", error);
     });
@@ -151,7 +150,7 @@ export async function isAbleToSponsor(
 async function getBlockNumberFromTimestamp(timestamp: number): Promise<number> {
   try {
     const response = await axios.get(
-      'https://api-optimistic.etherscan.io/api',
+      'https://api.celoscan.io/api',
       {
         params: {
           module: "block",
@@ -175,7 +174,7 @@ async function getBadgeTransactions(startBlock: number, account: string) {
   try {
     const wallet = new Wallet(ATTESTATOR_SIGNER_PRIVATE_KEY);
     const response = await axios.get(
-      `https://api-optimistic.etherscan.io/api`,
+      `https://api.celoscan.io/api`,
       {
         params: {
           module: "account",

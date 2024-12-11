@@ -11,7 +11,6 @@ import axios from "axios";
 import { GelatoRelay, SponsoredCallRequest } from "@gelatonetwork/relay-sdk";
 import { redisService } from "./redis.service";
 import sponsorshipValues from "../data/sponsorship.values.json";
-import config from "../config";
 import { superChainAccountService } from "./superChainAccount.service";
 import { celo } from "viem/chains";
 

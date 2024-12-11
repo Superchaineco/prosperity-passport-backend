@@ -35,40 +35,32 @@ export class AttestationsService {
     ]);
 
 
-      try {
-        const isLevelUp = await superChainAccountService.getIsLevelUp(
-          account,
-          totalPoints
-        );
+    try {
+      const isLevelUp = await superChainAccountService.getIsLevelUp(
+        account,
+        totalPoints
+      );
 
-        const tx = await this.eas.attest({
-          schema:
-            SUPER_CHAIN_ATTESTATION_SCHEMA,
-          data: {
-            recipient: account,
-            data: encodedData,
-            expirationTime: BigInt(0), 
-            value: BigInt(0),
-            refUID: ethers.ZeroHash,
-            revocable: false,
-          },
-        });
-        const badgeImages = Array.from(
-          new Set(
-            badges.flatMap(badge =>
-              badgeUpdates
-                .filter(update => badge.badgeId === update.badgeId)
-                .map(update => badge.badgeTiers.find(tier => Number(tier.tier) === Number(update.level))?.metadata?.['2DImage'])
-                .filter(image => image)
-            )
-          )
-        );
-        const receipt = await tx.wait();
-        return { hash: receipt?.hash, isLevelUp, badgeImages, totalPoints };
+      const tx = await this.eas.attest({
+        schema:
+          SUPER_CHAIN_ATTESTATION_SCHEMA,
+        data: {
+          recipient: account,
+          data: encodedData,
+          expirationTime: BigInt(0),
+          value: BigInt(0),
+          refUID: ethers.ZeroHash,
+          revocable: false,
+        },
+      });
+      const _badges = badges.filter(badge => badgeUpdates.some(update => update.badgeId == badge.badgeId)).map(badge => ({...badge, tier: badgeUpdates.find(update=> update.badgeId === badge.badgeId).level.toString()}));
+     
+      const receipt = await tx.wait();
+      return { hash: receipt.hash, isLevelUp, badges: _badges, totalPoints };
 
-      } catch (error: any) {
-        console.error('Error attesting', error);
-        throw new Error(error);
-      }
+    } catch (error: any) {
+      console.error('Error attesting', error);
+      throw new Error(error);
     }
   }
+}

@@ -2,11 +2,13 @@ import express from "express";
 import Session from 'express-session';
 import cors from "cors";
 import morgan from "morgan";
-
+import {RedisStore} from "connect-redis"
 import * as middleware from "./utils/middleware";
 import router from "./routes/router";
 import authRouter from "./routes/auth";
 import { DOMAIN, ENV, ENVIRONMENTS, SESSION_SECRET } from "./config/superChain/constants";
+import { redis } from "./utils/cache";
+
 
 const app = express();
 console.debug("ENV", ENV, DOMAIN);
@@ -27,7 +29,8 @@ app.use(Session({
   secret: SESSION_SECRET,
   resave: true,
   saveUninitialized: true,
-  cookie: cookieConfig
+  store: new RedisStore({ client: redis }),
+  cookie: { secure: ENV === ENVIRONMENTS.production,  sameSite: 'none' }
 }));
 
 if (ENV === ENVIRONMENTS.production) {

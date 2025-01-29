@@ -27,10 +27,11 @@ app.use(express.json());
 app.use(Session({
   name: 'Prosperity-passport-SIWE',
   secret: SESSION_SECRET,
-  resave: true,
-  saveUninitialized: true,
-  store: new RedisStore({ client: redis }),
-  cookie: { secure: ENV === ENVIRONMENTS.production,  sameSite: 'none' }
+  resave: false,
+  saveUninitialized: false,
+  store: new RedisStore({ client: redis, prefix: 'super-account-siwe:'}),
+  cookie: { secure: ENV === ENVIRONMENTS.production,  sameSite: 'none', maxAge:  7 * 24 * 3600 * 1000 },
+  rolling: true,
 }));
 
 if (ENV === ENVIRONMENTS.production) {

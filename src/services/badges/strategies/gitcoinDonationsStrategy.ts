@@ -6,7 +6,7 @@ export class GitcoinDonationsStrategy extends BaseBadgeStrategy {
 
     async getValue(eoas: string[]): Promise<number> {
         const cacheKey = `gitcoinDonations-${eoas.join(",")}`;
-        const ttl = 3600;
+        const ttl = 86400;
 
 
         const fetchFunction = async () => {

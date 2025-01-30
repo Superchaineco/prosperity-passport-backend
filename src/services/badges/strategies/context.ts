@@ -7,6 +7,7 @@ import { CeloTransactionsStrategy } from './celoTransactionsStrategy';
 import { CeloVotesStrategy } from './celoVotesStrategy';
 import { GitcoinDonationsStrategy } from './gitcoinDonationsStrategy';
 import { GivethDonationsStrategy } from './givethDonationsStrategy';
+import { GlodollarStrategy } from './glodollarStrategy';
 import { TalentScoreStrategy } from './talentScoreStrategy';
 
 
@@ -31,6 +32,8 @@ export class BadgeStrategyContext {
                 return new CeloStewardsStrategy()
             case "Regional DAO Lead":
                 return new CeloRegionalLeadStrategy()
+            case "USD GLO tiers":
+                return new GlodollarStrategy()
             default:
                 throw new Error(`Badge strategy ${badgeName} not found`);
         }

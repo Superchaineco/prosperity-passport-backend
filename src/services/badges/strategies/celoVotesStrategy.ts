@@ -8,11 +8,11 @@ export class CeloVotesStrategy extends BaseBadgeStrategy {
 
   async getValue(eoas: string[]): Promise<number> {
     const cacheKey = `celoVotes-${eoas.join(",")}`;
-    const ttl = 86400;
+    const ttl = 3600;
 
     const fetchFunction = async () => {
       let totalVotes = 0;
-      const dune_response  = await this.dune.getLatestResult({queryId: 3209131});
+      const dune_response  = await redisService.getCachedDataWithCallback('dune_celoVotes', async () => await this.dune.getLatestResult({queryId: 3209131,}), 86400);
       for (const eoa of eoas) {
         const celo_votes = dune_response.result?.rows.find((row: any) => row.voter.toLowerCase() === eoa.toLowerCase())
         if (celo_votes) {

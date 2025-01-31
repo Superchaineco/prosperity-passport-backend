@@ -9,12 +9,17 @@ export class RedisService {
         }
 
         const data = await fetchFunction();
-        if (ttl) {
+
+        if (ttl > 0) {
             await redis.set(key, JSON.stringify(data), "EX", ttl);
-        } else {
+        }
+        else {
             await redis.set(key, JSON.stringify(data));
         }
         return data;
+    } catch(error) {
+        console.error('Error getting cached data', error);
+        throw error;
     }
 
     public async setCachedData(key: string, data: any, ttl: number) {

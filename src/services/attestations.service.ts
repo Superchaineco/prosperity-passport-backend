@@ -6,6 +6,7 @@ import {
   ATTESTATOR_SIGNER_PRIVATE_KEY,
   EAS_CONTRACT_ADDRESS,
   JSON_RPC_PROVIDER,
+  SAFE_ACCOUNT,
   SUPER_CHAIN_ATTESTATION_SCHEMA,
 } from '../config/superChain/constants';
 import { superChainAccountService } from './superChainAccount.service';
@@ -23,10 +24,9 @@ export class AttestationsService {
 
 
 
-
   async estimateGas(account: string, txData: any) {
     const calldata = await this.eas.attest.populateTransaction(txData);
-   
+
     const txRequest: ethers.TransactionRequest = {
       to: this.easContractAddress,
       from: this.wallet.address,
@@ -43,12 +43,17 @@ export class AttestationsService {
     return estimatedCost
   }
 
-  async isPossibleToExecute(account: string, txData: any): Promise<boolean> {
+  
+
+
+  async tryAttestWithSafe(account: string, txData: any): Promise<string | boolean> {
+
+    
 
     const safeSdk = await Safe.default.init({
       provider: JSON_RPC_PROVIDER,
       signer: ATTESTATOR_SIGNER_PRIVATE_KEY,
-      safeAddress: account
+      safeAddress: SAFE_ACCOUNT
     })
 
 
@@ -65,11 +70,32 @@ export class AttestationsService {
       transactions: [safeTransactionData]
     })
 
-    const gasRequired = await this.estimateGas(account, txData)
-    const balance = await safeSdk.getBalance()
-    console.log('Currente balance:', balance, ' ETH')
+    // const gasRequired = await this.estimateGas(account, txData)
+    // const balance = await safeSdk.getBalance()
+    // console.log('Currente balance:', balance, ' ETH')
 
-    return await safeSdk.isValidTransaction(safeTransaction)
+    const isValid = await safeSdk.isValidTransaction(safeTransaction);
+
+    if(!isValid)
+      return isValid;
+
+
+
+    
+  }
+
+  async tryAttestWithGelato(account: string, txData: any): Promise<string | boolean> {
+
+
+    const safeSdk = await Safe.default.init({
+      provider: JSON_RPC_PROVIDER,
+      signer: ATTESTATOR_SIGNER_PRIVATE_KEY,
+      safeAddress: SAFE_ACCOUNT
+    })
+
+
+    return false;
+
   }
 
   public async attest(
@@ -108,13 +134,15 @@ export class AttestationsService {
 
 
 
-      const possible = await this.isPossibleToExecute(account, txData)
-      console.log("Is possible:", possible)
-
-      return;
 
 
-      const tx = await this.eas.attest(txData);
+      let attestSuccess = await this.tryAttestWithSafe(account, txData);
+      if (!attestSuccess)
+        attestSuccess = await this.tryAttestWithGelato(account, txData)
+
+      if (!attestSuccess)
+        throw new Error('Not enough funds');
+
       const badgeImages = Array.from(
         new Set(
           badges.flatMap((badge) =>
@@ -131,9 +159,16 @@ export class AttestationsService {
         )
       );
 
-      const receipt = await tx.wait();
-      return { hash: receipt.hash, isLevelUp, badges: _badges, totalPoints };
 
+      await this.claimBadgesOptimistically(account, badgeUpdates);
+
+      return {
+        hash: receipt?.hash,
+        isLevelUp,
+        badgeImages,
+        totalPoints,
+        badgeUpdates,
+      };
     } catch (error: any) {
       console.error('Error attesting', error);
       throw new Error(error);

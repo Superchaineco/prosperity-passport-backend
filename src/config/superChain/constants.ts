@@ -19,6 +19,8 @@ const config = {
     JSON_RPC_PROVIDER: process.env.JSON_RPC_PROVIDER,
     ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
     DOMAIN: "http://localhost:3000",
+    REDIS: process.env.REDIS_PUBLIC_URL,
+    SAFE_ADDRESS: process.env.SAFE_ADDRESS,
   },
   production: {
     SUPER_CHAIN_ACCOUNT_MODULE_ADDRESS:
@@ -28,7 +30,10 @@ const config = {
     EAS_CONTRACT_ADDRESS: "0x72E1d8ccf5299fb36fEfD8CC4394B8ef7e98Af92",
     JSON_RPC_PROVIDER: process.env.JSON_RPC_PROVIDER,
     ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
-    DOMAIN: "https://account.celopg.eco",
+    DOMAIN: "https://account.superchain.eco",
+    REDIS: process.env.REDIS_URL,
+    SAFE_ADDRESS: process.env.SAFE_ADDRESS,
+    GELATO_ADDRESS:process.env.GELATO_ADDRESS,
   },
 }[ENV];
 
@@ -56,3 +61,5 @@ export const SUBGRAPH_API_KEY = process.env.SUBGRAPH_API_KEY!;
 export const WC_PROJECT_ID = process.env.WC_PROJECT_ID!;
 export const DOMAIN = config.DOMAIN;
 export const SESSION_SECRET = process.env.SESSION_SECRET!;
+export const DUNE_API_KEY = process.env.DUNE_API_KEY!;
+export const SAFE_ACCOUNT = 

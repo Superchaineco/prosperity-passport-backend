@@ -10,6 +10,8 @@ import {
 } from '../config/superChain/constants';
 import { superChainAccountService } from './superChainAccount.service';
 import { ResponseBadge } from './badges/badges.service';
+import Safe from '@safe-global/protocol-kit';
+import { MetaTransactionData, OperationType } from '@safe-global/types-kit';
 
 export class AttestationsService {
   private easContractAddress = EAS_CONTRACT_ADDRESS;
@@ -18,6 +20,57 @@ export class AttestationsService {
   private wallet = new Wallet(ATTESTATOR_SIGNER_PRIVATE_KEY, this.provider);
   private eas = EAS__factory.connect(this.easContractAddress, this.wallet);
   private schemaEncoder = new SchemaEncoder(this.schemaString);
+
+
+
+
+  async estimateGas(account: string, txData: any) {
+    const calldata = await this.eas.attest.populateTransaction(txData);
+   
+    const txRequest: ethers.TransactionRequest = {
+      to: this.easContractAddress,
+      from: this.wallet.address,
+      data: calldata.data,
+    };
+    const gasPrice = await this.provider.estimateGas(txRequest);
+    const gasEstimate = await this.eas.attest.estimateGas(txData);
+    const estimatedCost = gasEstimate * gasPrice;
+    const estimatedCostInEth = ethers.formatEther(estimatedCost);
+    console.log(ATTESTATOR_SIGNER_PRIVATE_KEY)
+    console.log(`Gas Estimate: ${gasEstimate.toString()} units`);
+    console.log(`Gas Price: ${ethers.formatUnits(gasPrice, 'gwei')} gwei`);
+    console.log(`Estimated Cost: ${estimatedCostInEth} ETH`);
+    return estimatedCost
+  }
+
+  async isPossibleToExecute(account: string, txData: any): Promise<boolean> {
+
+    const safeSdk = await Safe.default.init({
+      provider: JSON_RPC_PROVIDER,
+      signer: ATTESTATOR_SIGNER_PRIVATE_KEY,
+      safeAddress: account
+    })
+
+
+    const calldata = await this.eas.attest.populateTransaction(txData);
+
+    const safeTransactionData: MetaTransactionData = {
+      to: this.easContractAddress,
+      value: '0',
+      data: calldata.data,
+      operation: OperationType.Call
+    }
+
+    const safeTransaction = await safeSdk.createTransaction({
+      transactions: [safeTransactionData]
+    })
+
+    const gasRequired = await this.estimateGas(account, txData)
+    const balance = await safeSdk.getBalance()
+    console.log('Currente balance:', balance, ' ETH')
+
+    return await safeSdk.isValidTransaction(safeTransaction)
+  }
 
   public async attest(
     account: string,
@@ -41,9 +94,8 @@ export class AttestationsService {
         totalPoints
       );
 
-      const tx = await this.eas.attest({
-        schema:
-          SUPER_CHAIN_ATTESTATION_SCHEMA,
+      const txData = {
+        schema: SUPER_CHAIN_ATTESTATION_SCHEMA,
         data: {
           recipient: account,
           data: encodedData,
@@ -52,9 +104,33 @@ export class AttestationsService {
           refUID: ethers.ZeroHash,
           revocable: false,
         },
-      });
-      const _badges = badges.filter(badge => badgeUpdates.some(update => update.badgeId == badge.badgeId)).map(badge => ({...badge, tier: badgeUpdates.find(update=> update.badgeId === badge.badgeId).level.toString()}));
-     
+      };
+
+
+
+      const possible = await this.isPossibleToExecute(account, txData)
+      console.log("Is possible:", possible)
+
+      return;
+
+
+      const tx = await this.eas.attest(txData);
+      const badgeImages = Array.from(
+        new Set(
+          badges.flatMap((badge) =>
+            badgeUpdates
+              .filter((update) => badge.badgeId === update.badgeId)
+              .map(
+                (update) =>
+                  badge.badgeTiers.find(
+                    (tier) => Number(tier.tier) === Number(update.level)
+                  )?.metadata?.['2DImage']
+              )
+              .filter((image) => image)
+          )
+        )
+      );
+
       const receipt = await tx.wait();
       return { hash: receipt.hash, isLevelUp, badges: _badges, totalPoints };
 

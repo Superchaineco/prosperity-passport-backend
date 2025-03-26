@@ -18,7 +18,7 @@ const config = {
     EAS_CONTRACT_ADDRESS: "0x72E1d8ccf5299fb36fEfD8CC4394B8ef7e98Af92",
     JSON_RPC_PROVIDER: process.env.JSON_RPC_PROVIDER,
     ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
-    DOMAIN: "https://safe-agentathon-eosin.vercel.app",
+    DOMAIN: "http://localhost:3000",
     REDIS: process.env.REDIS_PUBLIC_URL,
     SAFE_ADDRESS: process.env.SAFE_ADDRESS
   },

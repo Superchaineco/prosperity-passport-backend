@@ -20,7 +20,7 @@ const config = {
     ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
     DOMAIN: "http://localhost:3000",
     REDIS: process.env.REDIS_PUBLIC_URL,
-    SAFE_ADDRESS: process.env.SAFE_ADDRESS
+    SAFE_ADDRESS: "0x54efe9c4d7D91E2690f257A7855AAD4b21e20745"
   },
   production: {
     SUPER_CHAIN_ACCOUNT_MODULE_ADDRESS:
@@ -32,7 +32,7 @@ const config = {
     ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
     DOMAIN: "https://account.superchain.eco",
     REDIS: process.env.REDIS_URL,
-    SAFE_ADDRESS: process.env.SAFE_ADDRESS
+    SAFE_ADDRESS: "0x54efe9c4d7D91E2690f257A7855AAD4b21e20745"
   },
 }[ENV];
 
@@ -61,6 +61,7 @@ export const WC_PROJECT_ID = process.env.WC_PROJECT_ID!;
 export const DOMAIN = config.DOMAIN;
 export const SESSION_SECRET = process.env.SESSION_SECRET!;
 export const DUNE_API_KEY = process.env.DUNE_API_KEY!;
+export const SUNNY_TOKEN_ADDRESS = config.SUNNY_TOKEN_ADDRESS;
+export const SUNNY_AIRDROP_ADDRESS = config.SUNNY_AIRDROP_ADDRESS;
 export const SAFE_ADDRESS =  config.SAFE_ADDRESS
 export const PIMLICO_API_KEY =  process.env.PIMLICO_API_KEY
-export const CELO_CHAIN_ID = 42220

@@ -33,13 +33,9 @@ import {
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
-import type { SuperchainsmartaccountsTypes } from './sources/superchainsmartaccounts/types';
-import * as importedModule$0 from './sources/superchainsmartaccounts/introspectionSchema';
-import {
-  ENV,
-  ENVIRONMENTS,
-  SUBGRAPH_API_KEY,
-} from '../src/config/superChain/constants';
+import type { SuperAccountsTypes } from './sources/super-accounts/types';
+import * as importedModule$0 from "./sources/super-accounts/introspectionSchema";
+import { SUBGRAPH_API_KEY } from '@/config/superChain/constants';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -2330,11 +2326,9 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
   const additionalEnvelopPlugins: MeshPlugin<any>[] = [];
   const superchainsmartaccountsTransforms = [];
   const additionalTypeDefs = [] as any[];
-  const superchainsmartaccountsHandler = new GraphqlHandler({
-    name: 'superchainsmartaccounts',
-    config: {
-      endpoint: `https://gateway.thegraph.com/api/${SUBGRAPH_API_KEY}/subgraphs/id/3dQGijWxqpFfXUenK9TjLc9wijNeDDSjGtw3ztWMQb2n`,
-    },
+  const superAccountsHandler = new GraphqlHandler({
+    name: "super-accounts",
+    config: { "endpoint": `https://gateway.thegraph.com/api/${SUBGRAPH_API_KEY}/subgraphs/id/A8Hs1ciwnqsdR8owyFZ77GM5PEXpQBqUTEUpNcnUS6xt` },
     baseDir,
     cache,
     pubsub,

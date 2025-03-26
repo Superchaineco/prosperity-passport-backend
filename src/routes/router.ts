@@ -15,7 +15,9 @@ routes.get('/user/:account/perks', perksByAccount);
 
 routes.get('/perks/:level', perksByLevel);
 
-routes.post("/user/:account/badges/claim",verifyOwner, claimBadges); 
+routes.get("/user/:account/sponsorship-balance", getBalance);
+
+routes.post("/user/:account/badges/claim", verifyOwner, claimBadges);
 
 routes.post('/validate-sponsorship', validateSponsorship);
 

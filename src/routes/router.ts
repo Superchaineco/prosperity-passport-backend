@@ -7,23 +7,20 @@ import { getBalance, relay, reverseProxy, validateSponsorship } from "../control
 
 export const routes = Router();
 
-routes.get("/user/:account", getUser);
+routes.get('/user/:account', getUser);
 
-routes.get("/user/:account/badges", getBadges);
+routes.get('/user/:account/badges', getBadges);
 
-routes.get("/user/:account/perks", perksByAccount);
+routes.get('/user/:account/perks', perksByAccount);
 
-routes.get("/perks/:level", perksByLevel);
+routes.get('/perks/:level', perksByLevel);
 
-routes.get("/user/:account/sponsorship-balance", getBalance);
+routes.post("/user/:account/badges/claim",verifyOwner, claimBadges); 
 
-routes.post("/user/:account/badges/claim",  claimBadges); //verifyOwner
+routes.post('/validate-sponsorship', validateSponsorship);
 
-routes.post("/validate-sponsorship", validateSponsorship);
+routes.post('/relay', relay);
 
-routes.post("/relay", relay)
-
-routes.post("/user-op-reverse-proxy", verifyReverseProxy, reverseProxy);
-
+routes.post('/user-op-reverse-proxy', verifyReverseProxy, reverseProxy);
 
 export default routes;

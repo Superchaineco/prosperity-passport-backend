@@ -6,8 +6,7 @@ export enum ENVIRONMENTS {
   production = "production",
 }
 
-export const ENV =
-  (process.env.NODE_ENV as ENVIRONMENTS) || ENVIRONMENTS.development;
+export const ENV = process.env.NODE_ENV || ENVIRONMENTS.development;
 
 const config = {
   development: {
@@ -18,7 +17,7 @@ const config = {
     EAS_CONTRACT_ADDRESS: "0x72E1d8ccf5299fb36fEfD8CC4394B8ef7e98Af92",
     JSON_RPC_PROVIDER: process.env.JSON_RPC_PROVIDER,
     ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
-    DOMAIN: "http://localhost:3000",
+    DOMAIN: "https://staging.account.superchain.eco",
     REDIS: process.env.REDIS_PUBLIC_URL,
     SAFE_ADDRESS: "0x54efe9c4d7D91E2690f257A7855AAD4b21e20745"
   },
@@ -37,7 +36,9 @@ const config = {
 }[ENV];
 
 import SuperChainModuleABI from "./abi/SuperChainModule.json";
+import SunnyAirdropABI from "./abi/SunnyAirdrop.json";
 export const SUPER_CHAIN_MODULE_ABI = SuperChainModuleABI;
+export const SUNNY_AIRDROP_ABI = SunnyAirdropABI;
 export const SUPER_CHAIN_ACCOUNT_MODULE_ADDRESS =
   config.SUPER_CHAIN_ACCOUNT_MODULE_ADDRESS;
 export const SUPER_CHAIN_ATTESTATION_SCHEMA =
@@ -61,6 +62,8 @@ export const WC_PROJECT_ID = process.env.WC_PROJECT_ID!;
 export const DOMAIN = config.DOMAIN;
 export const SESSION_SECRET = process.env.SESSION_SECRET!;
 export const DUNE_API_KEY = process.env.DUNE_API_KEY!;
+export const SUNNY_TOKEN_ADDRESS = config.SUNNY_TOKEN_ADDRESS;
+export const SUNNY_AIRDROP_ADDRESS = config.SUNNY_AIRDROP_ADDRESS;
 export const SUNNY_TOKEN_ADDRESS = config.SUNNY_TOKEN_ADDRESS;
 export const SUNNY_AIRDROP_ADDRESS = config.SUNNY_AIRDROP_ADDRESS;
 export const SAFE_ADDRESS =  config.SAFE_ADDRESS

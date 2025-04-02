@@ -37,9 +37,7 @@ const config = {
 // }[ENV];
 
 import SuperChainModuleABI from './abi/SuperChainModule.json';
-import SunnyAirdropABI from './abi/SunnyAirdrop.json';
 export const SUPER_CHAIN_MODULE_ABI = SuperChainModuleABI;
-export const SUNNY_AIRDROP_ABI = SunnyAirdropABI;
 export const SUPER_CHAIN_ACCOUNT_MODULE_ADDRESS =
   config.SUPER_CHAIN_ACCOUNT_MODULE_ADDRESS;
 export const SUPER_CHAIN_ATTESTATION_SCHEMA =

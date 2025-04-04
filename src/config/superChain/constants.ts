@@ -31,7 +31,7 @@ const config = {
   JSON_RPC_PROVIDER: process.env.JSON_RPC_PROVIDER,
   ETHERSCAN_API_KEY: process.env.ETHERSCAN_API_KEY,
   DOMAIN: process.env.DOMAIN, // "https://account.superchain.eco",
-  REDIS: process.env.REDIS_PUBLIC_URL,
+  REDIS: process.env.REDIS_URL,
   SAFE_ADDRESS: process.env.SAFE_ADDRESS, //"0x54efe9c4d7D91E2690f257A7855AAD4b21e20745"
 }; //,
 // }[ENV];

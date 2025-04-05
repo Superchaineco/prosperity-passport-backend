@@ -33,8 +33,8 @@ import {
 import { MeshStore, FsStoreStorageAdapter } from '@graphql-mesh/store';
 import { path as pathModule } from '@graphql-mesh/cross-helpers';
 import { ImportFn } from '@graphql-mesh/types';
-import type { SuperAccountsTypes } from './sources/super-accounts/types';
-import * as importedModule$0 from "./sources/super-accounts/introspectionSchema";
+import type { SuperAccountsTypes } from './sources/superchainsmartaccounts/types';
+import * as importedModule$0 from "./sources/superchainsmartaccounts/introspectionSchema";
 import { SUBGRAPH_URI } from '@/config/superChain/constants';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -2338,7 +2338,7 @@ export async function getMeshOptions(): Promise<GetMeshOptions> {
   });
   sources[0] = {
     name: 'superchainsmartaccounts',
-    handler: superchainsmartaccountsHandler,
+    handler: superAccountsHandler,
     transforms: superchainsmartaccountsTransforms,
   };
   const additionalResolvers = [] as any[];

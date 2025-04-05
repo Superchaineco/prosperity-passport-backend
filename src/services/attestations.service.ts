@@ -4,6 +4,7 @@ import { ethers, JsonRpcProvider, Wallet, ZeroAddress, zeroPadValue } from 'ethe
 import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import {
   ATTESTATOR_SIGNER_PRIVATE_KEY,
+  CELO_CHAIN_ID,
   EAS_CONTRACT_ADDRESS,
   JSON_RPC_PROVIDER,
   PIMLICO_API_KEY,
@@ -17,7 +18,6 @@ import Safe, { OnchainAnalyticsProps } from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
 import Safe4337Pack from '@safe-global/relay-kit/dist/src/packs/safe-4337/Safe4337Pack';
 import { MetaTransactionData, OperationType } from '@safe-global/types-kit';
-import config from '@/config';
 
 export class AttestationsService {
   private easContractAddress = EAS_CONTRACT_ADDRESS;
@@ -80,7 +80,7 @@ export class AttestationsService {
     ).Safe4337Pack.init({
       provider: JSON_RPC_PROVIDER,
       signer: ATTESTATOR_SIGNER_PRIVATE_KEY,
-      bundlerUrl: `https://api.pimlico.io/v2/${config.constants.OPTIMISM_CHAIN_ID}/rpc?apikey=${PIMLICO_API_KEY}`,
+      bundlerUrl: `https://api.pimlico.io/v2/${CELO_CHAIN_ID}/rpc?apikey=${PIMLICO_API_KEY}`,
       options: {
         owners: [this.wallet.address],
         threshold: 1,
@@ -88,7 +88,7 @@ export class AttestationsService {
       },
       paymasterOptions: {
         isSponsored: true,
-        paymasterUrl: `https://api.pimlico.io/v2/${config.constants.OPTIMISM_CHAIN_ID}/rpc?apikey=${PIMLICO_API_KEY}`,
+        paymasterUrl: `https://api.pimlico.io/v2/${CELO_CHAIN_ID}/rpc?apikey=${PIMLICO_API_KEY}`,
       },
       onchainAnalytics,
     });

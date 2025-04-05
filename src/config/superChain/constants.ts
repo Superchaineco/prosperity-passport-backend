@@ -63,3 +63,4 @@ export const SESSION_SECRET = process.env.SESSION_SECRET!;
 export const DUNE_API_KEY = process.env.DUNE_API_KEY!;
 export const SAFE_ADDRESS =  config.SAFE_ADDRESS
 export const PIMLICO_API_KEY =  process.env.PIMLICO_API_KEY
+export const CELO_CHAIN_ID = 42220

@@ -4,7 +4,6 @@ import { ethers, JsonRpcProvider, Wallet, ZeroAddress, zeroPadValue } from 'ethe
 import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import {
   ATTESTATOR_SIGNER_PRIVATE_KEY,
-  CELO_CHAIN_ID,
   EAS_CONTRACT_ADDRESS,
   JSON_RPC_PROVIDER,
   PIMLICO_API_KEY,
@@ -80,7 +79,7 @@ export class AttestationsService {
     ).Safe4337Pack.init({
       provider: JSON_RPC_PROVIDER,
       signer: ATTESTATOR_SIGNER_PRIVATE_KEY,
-      bundlerUrl: `https://api.pimlico.io/v2/${config.constants.OPTIMISM_CHAIN_ID}/rpc?apikey=${PIMLICO_API_KEY}`,
+      bundlerUrl: `https://api.pimlico.io/v2/${config.constants.CELO_CHAIN_ID}/rpc?apikey=${PIMLICO_API_KEY}`,
       options: {
         owners: [this.wallet.address],
         threshold: 1,
@@ -88,7 +87,7 @@ export class AttestationsService {
       },
       paymasterOptions: {
         isSponsored: true,
-        paymasterUrl: `https://api.pimlico.io/v2/${config.constants.OPTIMISM_CHAIN_ID}/rpc?apikey=${PIMLICO_API_KEY}`,
+        paymasterUrl: `https://api.pimlico.io/v2/${config.constants.CELO_CHAIN_ID}/rpc?apikey=${PIMLICO_API_KEY}`,
       },
       onchainAnalytics,
     });

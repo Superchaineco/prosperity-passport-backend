@@ -1,6 +1,8 @@
 
 import { BadgeStrategy } from './badgeStrategy';
+import { CeloCommunityGuildStrategy } from './celoCommunityGuildStrategy';
 import { CeloGenesisStrategy } from './celoGenesisStrategy';
+import { CeloGovernanceGuardianStrategy } from './celoGovernanceGuardianStrategy';
 import { CeloRegionalLeadStrategy } from './celoRegionalLeadStrategy';
 import { CeloStewardsStrategy } from './celoStewardsStrategy';
 import { CeloTransactionsStrategy } from './celoTransactionsStrategy';
@@ -15,7 +17,7 @@ import { TalentScoreStrategy } from './talentScoreStrategy';
 
 export class BadgeStrategyContext {
   static getBadgeStrategy(badgeName: string): BadgeStrategy {
-    switch (badgeName) {
+    switch (badgeName.trim()) {
 
       case "Celo Genesis":
         return new CeloGenesisStrategy()
@@ -37,6 +39,10 @@ export class BadgeStrategyContext {
         return new GlodollarStrategy()
       case "ReFi DAO Member":
         return new ReFiDaoMemberStrategy()
+      case "Community Guild":
+        return new CeloCommunityGuildStrategy()
+      case "Governance Guardian":
+        return new CeloGovernanceGuardianStrategy()
       default:
         throw new Error(`Badge strategy ${badgeName} not found`);
     }

@@ -31,7 +31,7 @@ export class CeloGenesisStrategy extends BaseBadgeStrategy {
       const date = new Date(olderTxnTimestamp * 1000);
       return date.getUTCFullYear();
     };
-    return redisService.getCachedDataWithCallback(cacheKey, fetchFunction);
+    return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, null);
   }
 
 

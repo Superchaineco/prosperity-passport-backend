@@ -23,8 +23,8 @@ export class ReFiDaoMemberStrategy extends BaseBadgeStrategy {
   async getValue(eoas: string[]): Promise<boolean> {
     const csvData = await this.loadCsvData("src/data/refiDAOMembers.csv");
     for (const eoa of eoas) {
-      const stewards = csvData.find((row) => row.Address.toLowerCase() === eoa.toLowerCase());
-      if (stewards) {
+      const refiDAOMember = csvData.find((row) => row.Address.toLowerCase() === eoa.toLowerCase());
+      if (refiDAOMember) {
         return true;
       }
     }

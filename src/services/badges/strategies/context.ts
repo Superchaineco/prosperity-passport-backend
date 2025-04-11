@@ -10,6 +10,7 @@ import { CeloVotesStrategy } from './celoVotesStrategy';
 import { GitcoinDonationsStrategy } from './gitcoinDonationsStrategy';
 import { GivethDonationsStrategy } from './givethDonationsStrategy';
 import { GlodollarStrategy } from './glodollarStrategy';
+import { ProofOfShipStrategy } from './proofOfShipStrategy';
 import { ReFiDaoMemberStrategy } from './refiDaoMemberStrategy';
 import { TalentScoreStrategy } from './talentScoreStrategy';
 
@@ -43,6 +44,8 @@ export class BadgeStrategyContext {
         return new CeloCommunityGuildStrategy()
       case "Governance Guardian":
         return new CeloGovernanceGuardianStrategy()
+      case "Proof of Ship":
+        return new ProofOfShipStrategy()
       default:
         throw new Error(`Badge strategy ${badgeName} not found`);
     }

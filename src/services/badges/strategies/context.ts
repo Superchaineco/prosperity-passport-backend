@@ -8,36 +8,39 @@ import { CeloVotesStrategy } from './celoVotesStrategy';
 import { GitcoinDonationsStrategy } from './gitcoinDonationsStrategy';
 import { GivethDonationsStrategy } from './givethDonationsStrategy';
 import { GlodollarStrategy } from './glodollarStrategy';
+import { ReFiDaoMemberStrategy } from './refiDaoMemberStrategy';
 import { TalentScoreStrategy } from './talentScoreStrategy';
 
 
 
 export class BadgeStrategyContext {
-    static getBadgeStrategy(badgeName: string): BadgeStrategy {
-        switch (badgeName) {
+  static getBadgeStrategy(badgeName: string): BadgeStrategy {
+    switch (badgeName) {
 
-            case "Celo Genesis":
-                return new CeloGenesisStrategy()
-            case "Celo User":
-                return new CeloTransactionsStrategy()
-            case "Giveth Donor":
-                return new GivethDonationsStrategy()
-            case "Gitcoin Donor":
-                return new GitcoinDonationsStrategy()
-            case "Talent Protocol Score":
-                return new TalentScoreStrategy()
-            case "Celo Voter":
-                return new CeloVotesStrategy()
-            case "CeloPG Steward":
-                return new CeloStewardsStrategy()
-            case "Regional DAO Lead":
-                return new CeloRegionalLeadStrategy()
-            case "USD GLO tiers":
-                return new GlodollarStrategy()
-            default:
-                throw new Error(`Badge strategy ${badgeName} not found`);
-        }
+      case "Celo Genesis":
+        return new CeloGenesisStrategy()
+      case "Celo User":
+        return new CeloTransactionsStrategy()
+      case "Giveth Donor":
+        return new GivethDonationsStrategy()
+      case "Gitcoin Donor":
+        return new GitcoinDonationsStrategy()
+      case "Talent Protocol Score":
+        return new TalentScoreStrategy()
+      case "Celo Voter":
+        return new CeloVotesStrategy()
+      case "CeloPG Steward":
+        return new CeloStewardsStrategy()
+      case "Regional DAO Lead":
+        return new CeloRegionalLeadStrategy()
+      case "USD GLO tiers":
+        return new GlodollarStrategy()
+      case "ReFi DAO Member":
+        return new ReFiDaoMemberStrategy()
+      default:
+        throw new Error(`Badge strategy ${badgeName} not found`);
     }
+  }
 
 
 }

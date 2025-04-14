@@ -29,7 +29,7 @@ export class AttestationsService {
 
   async tryAttestWithSafe(txData: any): Promise<string | boolean> {
     const onchainAnalytics: OnchainAnalyticsProps = {
-      project: 'SuperAccounts',
+      project: 'ProsperityAccounts',
       platform: 'Web',
     };
     // @ts-expect-error ESM import
@@ -48,6 +48,7 @@ export class AttestationsService {
       data: data,
     };
 
+
     const safeTransaction = await safeSdk.createTransaction({
       transactions: [safeTransactionData],
     });
@@ -55,6 +56,7 @@ export class AttestationsService {
     const isValid = await safeSdk.isValidTransaction(safeTransaction, {
       from: SAFE_ADDRESS,
     });
+
 
     if (!isValid) return isValid;
 
@@ -150,16 +152,18 @@ export class AttestationsService {
         },
       };
       let attestSuccess = await this.tryAttestWithSafe(txData);
+
       if (!attestSuccess)
         attestSuccess = await this.tryAttestWithRelayKit(account, txData);
 
+
       if (!attestSuccess) throw new Error('Not enough funds');
-      
+
       if (typeof attestSuccess === 'string') {
         await this.provider.waitForTransaction(attestSuccess, 1);
       }
 
-      const updatedBadges = badges.filter(badge => 
+      const updatedBadges = badges.filter(badge =>
         badgeUpdates.some(update => update.badgeId === badge.badgeId)
       );
 

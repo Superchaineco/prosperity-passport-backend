@@ -47,7 +47,7 @@ export async function callPimlicoAPI({ jsonrpc, method, params, id }: any) {
       // }
     }
     const response = await axios.post(
-      `https://api.pimlico.io/v2/${celo.id}/rpc`,
+      `https://api.pimlico.io/v2/${config.constants.CELO_CHAIN_ID}/rpc`,
       {
         jsonrpc: '2.0',
         method: method,

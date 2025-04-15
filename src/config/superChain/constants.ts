@@ -64,3 +64,4 @@ export const DUNE_API_KEY = process.env.DUNE_API_KEY!;
 export const SAFE_ADDRESS = config.SAFE_ADDRESS;
 export const PIMLICO_API_KEY = process.env.PIMLICO_API_KEY;
 export const SUBGRAPH_URI = process.env.SUBGRAPH_URI!;
+export const BLOCKSCOUT_API_KEY = process.env.BLOCKSCOUT_API_KEY!;

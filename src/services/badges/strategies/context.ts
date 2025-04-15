@@ -27,7 +27,7 @@ export class BadgeStrategyContext {
                 return new CeloGenesisStrategy()
             case "L1 Transactions":
                 return new CeloTransactionsStrategy()
-            case "CEL2 transactions":
+            case "CEL2 Transactions":
                 return new Celo2TransactionsStrategy()
             case "Giveth Donor":
                 return new GivethDonationsStrategy()

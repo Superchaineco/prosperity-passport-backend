@@ -4,7 +4,7 @@ import csv from "csv-parser";
 
 type CsvRow = {
     Address: string;
-    ENS: string;
+    Amount: number;
 };
 
 export class ProofOfShipStrategy extends BaseBadgeStrategy {
@@ -19,14 +19,17 @@ export class ProofOfShipStrategy extends BaseBadgeStrategy {
         });
     }
 
-    async getValue(eoas: string[]): Promise<boolean> {
+    async getValue(eoas: string[]): Promise<number> {
         const csvData = await this.loadCsvData("src/data/proofOfShip.csv");
+        let totalAmount = 0;
+        
         for (const eoa of eoas) {
             const proofOfShip = csvData.find((row) => row.Address.toLowerCase() === eoa.toLowerCase());
             if (proofOfShip) {
-                return true;
+                totalAmount += proofOfShip.Amount;
             }
         }
-        return false;
+        
+        return totalAmount;
     }
 }

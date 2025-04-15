@@ -7,7 +7,7 @@ type CsvRow = {
     Amount: number;
 };
 
-export class ProofOfShipStrategy extends BaseBadgeStrategy {
+export class EcoCreditsStrategy extends BaseBadgeStrategy {
 
     private async loadCsvData(filePath: string): Promise<CsvRow[]> {
         return new Promise((resolve, reject) => {
@@ -20,13 +20,13 @@ export class ProofOfShipStrategy extends BaseBadgeStrategy {
     }
 
     async getValue(eoas: string[]): Promise<number> {
-        const csvData = await this.loadCsvData("src/data/proofOfShip.csv");
+        const csvData = await this.loadCsvData("src/data/ecoCredits.csv");
         let totalAmount = 0;
         
         for (const eoa of eoas) {
-            const proofOfShip = csvData.find((row) => row.Address.toLowerCase() === eoa.toLowerCase());
-            if (proofOfShip) {
-                totalAmount += proofOfShip.Amount;
+            const ecoCredits = csvData.find((row) => row.Address.toLowerCase() === eoa.toLowerCase());
+            if (ecoCredits) {
+                totalAmount += ecoCredits.Amount;
             }
         }
         

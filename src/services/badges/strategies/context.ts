@@ -7,6 +7,7 @@ import { CeloRegionalLeadStrategy } from './celoRegionalLeadStrategy';
 import { CeloStewardsStrategy } from './celoStewardsStrategy';
 import { CeloTransactionsStrategy } from './celoTransactionsStrategy';
 import { CeloVotesStrategy } from './celoVotesStrategy';
+import { EcoCreditsStrategy } from './ecoCreditsStrategy';
 import { GitcoinDonationsStrategy } from './gitcoinDonationsStrategy';
 import { GivethDonationsStrategy } from './givethDonationsStrategy';
 import { GlodollarStrategy } from './glodollarStrategy';
@@ -46,6 +47,8 @@ export class BadgeStrategyContext {
         return new CeloGovernanceGuardianStrategy()
       case "Proof of Ship":
         return new ProofOfShipStrategy()
+      case "Eco Credit Retirement":
+        return new EcoCreditsStrategy()
       default:
         throw new Error(`Badge strategy ${badgeName} not found`);
     }

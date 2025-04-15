@@ -13,6 +13,7 @@ import { GivethDonationsStrategy } from './givethDonationsStrategy';
 import { GlodollarStrategy } from './glodollarStrategy';
 import { ProofOfShipStrategy } from './proofOfShipStrategy';
 import { ReFiDaoMemberStrategy } from './refiDaoMemberStrategy';
+import { SelfVerificationStrategy } from './selfVerificationStrategy';
 import { TalentScoreStrategy } from './talentScoreStrategy';
 
 
@@ -49,6 +50,8 @@ export class BadgeStrategyContext {
         return new ProofOfShipStrategy()
       case "Eco Credit Retirement":
         return new EcoCreditsStrategy()
+      case "Self verification":
+        return new SelfVerificationStrategy()
       default:
         throw new Error(`Badge strategy ${badgeName} not found`);
     }

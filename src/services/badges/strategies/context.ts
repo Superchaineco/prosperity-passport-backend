@@ -51,10 +51,10 @@ export class BadgeStrategyContext {
                 return new CeloGovernanceGuardianStrategy()
             case "Proof of Ship":
                 return new ProofOfShipStrategy()
-      case "Eco Credit Retirement":
-        return new EcoCreditsStrategy()
-      case "Self verification":
-        return new SelfVerificationStrategy()
+            case "Eco Credit Retirement":
+                return new EcoCreditsStrategy()
+            case "Self verification":
+                return new SelfVerificationStrategy()
             default:
                 throw new Error(`Badge strategy ${badgeName} not found`);
         }

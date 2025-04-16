@@ -1,7 +1,9 @@
 
 import { BadgeStrategy } from './badgeStrategy';
 import { Celo2TransactionsStrategy } from './celo2TransactionsStrategy';
+import { CeloCitizenStrategy } from './celoCitizenStrategy';
 import { CeloCommunityGuildStrategy } from './celoCommunityGuildStrategy';
+import { CeloEventsPoapStrategy } from './celoEventsPoapStrategy';
 import { CeloGenesisStrategy } from './celoGenesisStrategy';
 import { CeloGovernanceGuardianStrategy } from './celoGovernanceGuardianStrategy';
 import { CeloRegionalLeadStrategy } from './celoRegionalLeadStrategy';
@@ -12,6 +14,7 @@ import { EcoCreditsStrategy } from './ecoCreditsStrategy';
 import { GitcoinDonationsStrategy } from './gitcoinDonationsStrategy';
 import { GivethDonationsStrategy } from './givethDonationsStrategy';
 import { GlodollarStrategy } from './glodollarStrategy';
+import { GreenPillMemberStrategy } from './greenPillMemberStrategy';
 import { ProofOfShipStrategy } from './proofOfShipStrategy';
 import { ReFiDaoMemberStrategy } from './refiDaoMemberStrategy';
 import { SelfVerificationStrategy } from './selfVerificationStrategy';
@@ -55,6 +58,12 @@ export class BadgeStrategyContext {
                 return new EcoCreditsStrategy()
             case "Self verification":
                 return new SelfVerificationStrategy()
+            case "GreenPill Member":
+                return new GreenPillMemberStrategy()
+            case "Celo Citizen":
+                return new CeloCitizenStrategy()
+            case "Celo Event POAPs":
+                return new CeloEventsPoapStrategy()
             default:
                 throw new Error(`Badge strategy ${badgeName} not found`);
         }

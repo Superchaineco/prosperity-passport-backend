@@ -46,7 +46,7 @@ export class BadgeStrategyContext {
                 return new CeloRegionalLeadStrategy()
             case "USD GLO tiers":
                 return new GlodollarStrategy()
-            case "ReFi DAO Member":
+            case "ReFi DAO Contributor":
                 return new ReFiDaoMemberStrategy()
             case "Community Guild":
                 return new CeloCommunityGuildStrategy()

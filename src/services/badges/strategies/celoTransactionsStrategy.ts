@@ -38,7 +38,8 @@ export class CeloTransactionsStrategy extends BaseBadgeStrategy {
 
       const fetchFunction = async () => {
           const transactions = eoas.reduce(async (accPromise, eoa) => {
-              const response = await axios.get(`https://celo.blockscout.com/api?module=account&action=txlist&address=${eoa}&sort=asc&startblock=0&endblock=99999999&apikey=${BLOCKSCOUT_API_KEY}`)
+              const response = await axios.get(`https://celo.blockscout.com/api?module=account&action=txlist&address=${eoa}&sort=asc&startblock=0&endblock=31056500&apikey=${BLOCKSCOUT_API_KEY}`)
+              console.log({response: response.data});
               const transactions = response.data.result.filter((tx: any) => tx.from.toLowerCase() === eoa.toLowerCase()).length;
               return (await accPromise) + transactions;
           }, Promise.resolve(0));

@@ -33,7 +33,7 @@ export class CeloTransactionsStrategy extends BaseBadgeStrategy {
 
 
   async getValue(eoas: string[]): Promise<number> {
-      const cacheKey = `celo2Transactions-${eoas.join(",")}`;
+      const cacheKey = `celoTransactions-${eoas.join(",")}`;
       const ttl = 3600
 
       const fetchFunction = async () => {

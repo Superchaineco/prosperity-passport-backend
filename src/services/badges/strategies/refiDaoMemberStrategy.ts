@@ -5,7 +5,7 @@ import csv from "csv-parser";
 
 type CsvRow = {
   Address: string;
-  ENS: string;
+  Tier: string;
 };
 
 export class ReFiDaoMemberStrategy extends BaseBadgeStrategy {
@@ -20,14 +20,18 @@ export class ReFiDaoMemberStrategy extends BaseBadgeStrategy {
     });
   }
 
-  async getValue(eoas: string[]): Promise<boolean> {
+  async getValue(eoas: string[]): Promise<number> {
     const csvData = await this.loadCsvData("src/data/refiDAOMembers.csv");
+    let highestTier = 0;
     for (const eoa of eoas) {
       const refiDAOMember = csvData.find((row) => row.Address.toLowerCase() === eoa.toLowerCase());
       if (refiDAOMember) {
-        return true;
+        const tier = parseInt(refiDAOMember.Tier);
+        if (tier > highestTier) {
+          highestTier = tier;
+        }
       }
     }
-    return false;
+    return highestTier;
   }
 }

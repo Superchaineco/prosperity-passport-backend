@@ -9,7 +9,12 @@ import {
   reverseProxy,
   validateSponsorship,
 } from '../controllers/sponsor';
-import selfVerify, { getNationalitiesBatch, selfCheck } from '@/controllers/self';
+import selfVerify, {
+  getNationalitiesBatch,
+  selfCheck,
+} from '@/controllers/self';
+import { getVaults } from '@/controllers/vaults';
+
 export const routes = Router();
 
 routes.get('/user/:account', getUser);
@@ -25,6 +30,8 @@ routes.get('/user/:account/sponsorship-balance', getBalance);
 routes.post('/user/:account/badges/claim', verifyOwner, claimBadges);
 
 routes.post('/validate-sponsorship', validateSponsorship);
+
+routes.get('/vaults', getVaults);
 
 routes.post('/relay', relay);
 

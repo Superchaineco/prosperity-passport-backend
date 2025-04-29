@@ -1,10 +1,12 @@
-import { json } from 'express';
-import { get } from 'http';
 import { redis, redisClient } from '../utils/cache';
 import { createUser, getUser } from './usersService';
 
 export class RedisService {
-  public async getCachedDataWithCallback<T>(key: string, fetchFunction: () => Promise<T>, ttl: number): Promise<T> {
+  public async getCachedDataWithCallback<T>(
+    key: string,
+    fetchFunction: () => Promise<T>,
+    ttl: number
+  ): Promise<T> {
     try {
       const cachedData = await redis.get(key);
       if (cachedData) {
@@ -15,9 +17,8 @@ export class RedisService {
       const data = await fetchFunction();
 
       if (ttl > 0) {
-        await redis.set(key, JSON.stringify(data), "EX", ttl);
-      }
-      else {
+        await redis.set(key, JSON.stringify(data), 'EX', ttl);
+      } else {
         await redis.set(key, JSON.stringify(data));
       }
       return data;
@@ -28,33 +29,31 @@ export class RedisService {
   }
 
   public async setCachedData(key: string, data: any, ttl: number) {
-    if (ttl)
-      await redis.set(key, JSON.stringify(data), "EX", ttl);
+    if (ttl) await redis.set(key, JSON.stringify(data), 'EX', ttl);
     else {
-
       try {
         if (key.startsWith('self_id:')) {
-          await createUser({ account: key.replace('self_id:', ''), nationality: data.nationality })
+          await createUser({
+            account: key.replace('self_id:', ''),
+            nationality: data.nationality,
+          });
         } else {
           await redis.set(key, JSON.stringify(data));
         }
       } catch (error) {
         await redis.set(key, JSON.stringify(data));
       }
-
     }
   }
 
   public async getCachedData(key: string) {
-
     try {
       if (key.startsWith('self_id:')) {
-        return await getUser(key.replace('self_id:', ''))
+        return await getUser(key.replace('self_id:', ''));
       }
     } catch (error) {
       console.error('Error getting user', error);
     }
-
 
     const cachedData = await redis.get(key);
     if (cachedData) {
@@ -72,7 +71,6 @@ export class RedisService {
     });
     return result;
   }
-
 }
 
 export const redisService = new RedisService();

@@ -13,7 +13,7 @@ import selfVerify, {
   getNationalitiesBatch,
   selfCheck,
 } from '@/controllers/self';
-import { getVaults } from '@/controllers/vaults';
+import { getVaults, refreshVaults } from '@/controllers/vaults';
 
 export const routes = Router();
 
@@ -33,11 +33,13 @@ routes.post('/validate-sponsorship', validateSponsorship);
 
 routes.get('/vaults/:account', getVaults);
 
+routes.post('/vaults/:account/refresh', refreshVaults);
+
 routes.post('/relay', relay);
 
 routes.post('/self/verify', selfVerify);
 
-routes.get('/self/check',  selfCheck);
+routes.get('/self/check', selfCheck);
 
 routes.post('/leaderboard/nationalities', getNationalitiesBatch);
 

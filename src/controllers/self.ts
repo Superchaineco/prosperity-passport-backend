@@ -14,11 +14,14 @@ export default async function selfVerify(req: Request, res: Response) {
             // Extract user ID from the proof
             const userId = await getUserIdentifier(publicSignals);
             console.log("Extracted userId:", userId);
+                
 
             // Initialize and configure the verifier
             const selfBackendVerifier = new SelfBackendVerifier(
                 "prosperity",
-                "https://prosperity-passport-backend-production.up.railway.app/api/self/verify"
+                "https://prosperity-passport-backend-production.up.railway.app/api/self/verify",
+                "hex",
+                true
             );
 
             // Verify the proof

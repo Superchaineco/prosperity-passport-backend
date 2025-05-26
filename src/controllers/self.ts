@@ -29,6 +29,7 @@ export default async function selfVerify(req: Request, res: Response) {
 
             if (result.isValid) {
                 // Return successful verification response
+                console.log("Verification successful:", result.credentialSubject);
                 return res.status(200).json({
                     status: 'success',
                     result: true,
@@ -36,6 +37,7 @@ export default async function selfVerify(req: Request, res: Response) {
                 });
             } else {
                 // Return failed verification response
+                console.log("Verification failed:", result.credentialSubject);
                 return res.status(500).json({
                     status: 'error',
                     result: false,

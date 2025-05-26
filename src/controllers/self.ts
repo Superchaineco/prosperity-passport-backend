@@ -21,7 +21,7 @@ export default async function selfVerify(req: Request, res: Response) {
             const selfBackendVerifier = new SelfBackendVerifier(
                 "prosperity",
                 "https://prosperity-passport-backend-production.up.railway.app/api/self/verify",
-                "uuid",
+                "hex",
                 true
             );
 

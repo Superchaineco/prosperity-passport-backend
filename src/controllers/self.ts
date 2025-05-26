@@ -64,7 +64,7 @@ export default async function selfVerify(req: Request, res: Response) {
 
 export async function selfCheck(req: Request, res: Response) {
 
-    if (req.params.userId) {
+    if (req.query.userId) {
         const cache_key = `self_id_pre:${req.params.userId}`
         const selfData = redisService.getCachedData(cache_key)
 

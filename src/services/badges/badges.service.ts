@@ -221,8 +221,7 @@ export class BadgesServices {
 
   private async updateBadgeDataForAccount(
     eoas: string[],
-    badgeData: Badge,
-    account: string
+    badgeData: Badge
   ) {
     try {
       const strategy = BadgeStrategyContext.getBadgeStrategy(
@@ -230,8 +229,7 @@ export class BadgesServices {
       );
       const badgeResponse = await strategy.calculateTier(
         eoas,
-        badgeData,
-        account
+        badgeData
       );
       this.badges.push(badgeResponse);
     } catch (error) {

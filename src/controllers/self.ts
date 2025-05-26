@@ -11,12 +11,11 @@ export default async function selfVerify(req: Request, res: Response) {
                 return res.status(400).json({ message: 'Proof and publicSignals are required' });
             }
 
-            // Extract user ID from the proof
+          
             const userId = await getUserIdentifier(publicSignals);
             console.log("Extracted userId:", userId);
                 
 
-            // Initialize and configure the verifier
             const selfBackendVerifier = new SelfBackendVerifier(
                 "prosperity",
                 "https://prosperity-passport-backend-production.up.railway.app/api/self/verify",
@@ -24,11 +23,11 @@ export default async function selfVerify(req: Request, res: Response) {
                 true
             );
 
-            // Verify the proof
+           
             const result = await selfBackendVerifier.verify(proof, publicSignals);
 
             if (result.isValid) {
-                // Return successful verification response
+                
                 console.log("Verification successful:", result.credentialSubject);
                 return res.status(200).json({
                     status: 'success',
@@ -36,7 +35,7 @@ export default async function selfVerify(req: Request, res: Response) {
                     credentialSubject: result.credentialSubject
                 });
             } else {
-                // Return failed verification response
+                
                 console.log("Verification failed:", result.credentialSubject);
                 return res.status(500).json({
                     status: 'error',

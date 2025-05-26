@@ -30,7 +30,7 @@ routes.post('/relay', relay);
 
 routes.post('/self/verify', selfVerify);
 
-routes.post('/self/check', selfCheck);
+routes.get('/self/check', selfCheck);
 
 routes.post('/user-op-reverse-proxy', verifyReverseProxy, reverseProxy);
 

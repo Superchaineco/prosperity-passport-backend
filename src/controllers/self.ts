@@ -72,8 +72,12 @@ export async function selfCheck(req: Request, res: Response) {
     const selfData = redisService.getCachedData(cache_key);
 
     if (!selfData)
-      return res.status(404).json({ message: 'Self data not found' });
+      return res
+        .status(404)
+        .json({ message: 'Self data not found', check: false });
 
-    return res.status(200).json({ message: 'Validation success!' });
+    return res
+      .status(200)
+      .json({ message: 'Validation success!', check: true });
   }
 }

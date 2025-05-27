@@ -17,7 +17,7 @@ export default async function selfVerify(req: Request, res: Response) {
                     .status(400)
                     .json({ message: 'Proof and publicSignals are required' });
             }
-            
+
             const userId = '0X' + (await getUserIdentifier(publicSignals)).replace(/-/g, '').toUpperCase();
             console.log('Extracted userId:', userId);
 
@@ -75,7 +75,7 @@ export async function selfCheck(req: Request, res: Response) {
         if (selfData != null) {
             return res
                 .status(200)
-                .json({ message: 'Validation success!', check: true });
+                .json({ message: 'Validation success!', check: true, data: selfData });
         }
         return res
             .status(500)

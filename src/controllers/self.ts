@@ -17,8 +17,8 @@ export default async function selfVerify(req: Request, res: Response) {
                     .status(400)
                     .json({ message: 'Proof and publicSignals are required' });
             }
-
-            const userId = await getUserIdentifier(publicSignals);
+            
+            const userId = '0X' + (await getUserIdentifier(publicSignals)).replace(/-/g, '').toUpperCase();
             console.log('Extracted userId:', userId);
 
             const selfBackendVerifier = new SelfBackendVerifier(
@@ -31,8 +31,8 @@ export default async function selfVerify(req: Request, res: Response) {
             const result = await selfBackendVerifier.verify(proof, publicSignals);
 
             if (result.isValid) {
-                console.log('Verification successful:', result, req.params);
-                const cache_key = `self_id:${req.params.userId}`;
+                console.log('Verification successful:', result);
+                const cache_key = `self_id:${userId}`;
                 redisService.setCachedData(
                     cache_key,
                     result.credentialSubject,
@@ -68,7 +68,7 @@ export default async function selfVerify(req: Request, res: Response) {
 
 export async function selfCheck(req: Request, res: Response) {
     if (req.query.userId) {
-        const cache_key = `self_id:${req.query.userId}`;
+        const cache_key = `self_id:${(req.query.userId as string).toUpperCase()}`;
         const selfData = await redisService.getCachedData(cache_key);
         console.log('Checking self data for userId:', req.query.userId, selfData);
         console.log(selfData != null);

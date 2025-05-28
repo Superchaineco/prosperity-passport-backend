@@ -35,14 +35,13 @@ export default async function selfVerify(req: Request, res: Response) {
                 const cache_key = `self_id:${userId}`;
                 redisService.setCachedData(
                     cache_key,
-                    result.credentialSubject,
-                    60 * 60 * 24 * 7
+                    result.credentialSubject, 0
                 );
 
                 return res.status(200).json({
                     status: 'success',
                     result: true,
-                    data: result.credentialSubject,
+                    credentialSubject: result.credentialSubject,
                 });
             } else {
                 console.log('Verification failed:', result.credentialSubject);

@@ -14,9 +14,9 @@ export type ResponseBadge = {
   points: string;
   tier: string;
 } & Badge['badge'] & {
-    claimableTier: number | null;
-    claimable: boolean;
-  };
+  claimableTier: number | null;
+  claimable: boolean;
+};
 
 export class BadgesServices {
   private badges: ResponseBadge[] = [];
@@ -123,7 +123,7 @@ export class BadgesServices {
     }
 
     for (const badge of activeBadges) {
-      await this.updateBadgeDataForAccount(eoas, badge);
+      await this.updateBadgeDataForAccount(eoas, badge, account);
     }
 
     return this.badges;
@@ -221,11 +221,12 @@ export class BadgesServices {
 
   private async updateBadgeDataForAccount(
     eoas: string[],
-    badgeData: Badge
+    badgeData: Badge,
+    account: string
   ) {
     try {
       const strategy = BadgeStrategyContext.getBadgeStrategy(
-        badgeData.badge.metadata!.name
+        badgeData.badge.metadata!.name, account
       );
       const badgeResponse = await strategy.calculateTier(
         eoas,

@@ -72,7 +72,7 @@ export async function selfCheck(req: Request, res: Response) {
         const selfData = await redisService.getCachedData(cache_key);
         console.log('Checking self data for userId:', req.query.userId, selfData);
         console.log(selfData != null);
-        if (selfData != null) {
+        if (selfData != null && Object.keys(selfData).length > 0) {
             return res
                 .status(200)
                 .json({ message: 'Validation success!', check: true, data: selfData });

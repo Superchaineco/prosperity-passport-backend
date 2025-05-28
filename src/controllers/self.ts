@@ -78,7 +78,7 @@ export async function selfCheck(req: Request, res: Response) {
                 .json({ message: 'Validation success!', check: true, data: selfData });
         }
         return res
-            .status(500)
+            .status(200)
             .json({ message: 'Self data not found', check: false });
     }
 }

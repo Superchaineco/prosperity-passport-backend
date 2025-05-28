@@ -42,7 +42,7 @@ export default async function selfVerify(req: Request, res: Response) {
                 return res.status(200).json({
                     status: 'success',
                     result: true,
-                    credentialSubject: result.credentialSubject,
+                    data: result.credentialSubject,
                 });
             } else {
                 console.log('Verification failed:', result.credentialSubject);

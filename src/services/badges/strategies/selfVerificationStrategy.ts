@@ -17,7 +17,6 @@ export class SelfVerificationStrategy extends BaseBadgeStrategy {
         const selfData = redisService.getCachedData(cache_key)
 
         if (!selfData || Object.keys(selfData).length === 0) {
-            redisService.setCachedData(cache_key, {}, 0)
             return false
         }
 

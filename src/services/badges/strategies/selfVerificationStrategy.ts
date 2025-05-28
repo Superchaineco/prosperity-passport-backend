@@ -12,14 +12,11 @@ export class SelfVerificationStrategy extends BaseBadgeStrategy {
 
 
         const cache_key = `self_id:${this.account.toUpperCase()}`
-        //const cache_key = `self_id:${eoas.join(",")}`
 
-        const selfData = redisService.getCachedData(cache_key)
-
-        if (!selfData || Object.keys(selfData).length === 0) {
+        const selfData = await redisService.getCachedData(cache_key)       
+        if (!selfData || Object.keys(selfData).length === 0) 
             return false
-        }
-
+        
         return true;
 
     }

@@ -82,3 +82,61 @@ export async function selfCheck(req: Request, res: Response) {
             .json({ message: 'Self data not found', check: false });
     }
 }
+
+interface NationalityResponse {
+    [address: string]: string;
+}
+
+export async function getNationalitiesBatch(req: Request, res: Response) {
+    try {
+
+        const { addresses } = req.body;
+
+        if (!Array.isArray(addresses)) {
+            return res.status(400).json({
+                error: 'Bad request'
+            });
+        }
+
+
+        const processedAddresses = Array.from(
+            new Set(
+                addresses
+                    .filter(address => typeof address === 'string')
+                    .map(address => address.trim().toUpperCase())
+            )
+        );
+
+        if (processedAddresses.length === 0) {
+            return res.status(400).json({
+                error: 'Bad request'
+            });
+        }
+
+
+        const redisKeys = processedAddresses.map(address => `self_id:${address}`);
+
+
+        const redisResults = await Promise.all(
+            redisKeys.map(key => redisService.getCachedData(key))
+        );
+
+        const responseData: NationalityResponse = {};
+
+        processedAddresses.forEach((address, index) => {
+            const redisData = redisResults[index];
+            if (redisData && redisData.nationality) {
+                responseData[address] = redisData.nationality;
+            }
+
+        });
+
+        return res.status(200).json(responseData);
+
+    } catch (error) {
+        console.error('Error on getNationalitiesBatch:', error);
+        return res.status(500).json({
+            error: 'Internal error'
+        });
+    }
+}

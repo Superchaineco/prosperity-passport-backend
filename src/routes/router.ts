@@ -9,7 +9,7 @@ import {
   reverseProxy,
   validateSponsorship,
 } from '../controllers/sponsor';
-import selfVerify, { selfCheck } from '@/controllers/self';
+import selfVerify, { getNationalitiesBatch, selfCheck } from '@/controllers/self';
 export const routes = Router();
 
 routes.get('/user/:account', getUser);
@@ -31,6 +31,8 @@ routes.post('/relay', relay);
 routes.post('/self/verify', selfVerify);
 
 routes.get('/self/check', selfCheck);
+
+routes.post('/leaderboard/nationalities', getNationalitiesBatch);
 
 routes.post('/user-op-reverse-proxy', verifyReverseProxy, reverseProxy);
 

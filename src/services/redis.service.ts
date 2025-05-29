@@ -1,7 +1,7 @@
 import { json } from 'express';
 import { get } from 'http';
 import { redis, redisClient } from '../utils/cache';
-import { createUser } from './usersService';
+import { createUser, getUser } from './usersService';
 
 export class RedisService {
   public async getCachedDataWithCallback<T>(key: string, fetchFunction: () => Promise<T>, ttl: number): Promise<T> {
@@ -31,15 +31,29 @@ export class RedisService {
     if (ttl)
       await redis.set(key, JSON.stringify(data), "EX", ttl);
     else {
-      await redis.set(key, JSON.stringify(data));
 
-      if (key.startsWith('self_id:')) {
-        await createUser({ account: key.replace('self_id:', ''), nationality: data.nationality })
+      try {
+        if (key.startsWith('self_id:')) {
+          await createUser({ account: key.replace('self_id:', ''), nationality: data.nationality })
+        }
+      } catch (error) {
+        await redis.set(key, JSON.stringify(data));
       }
+
     }
   }
 
   public async getCachedData(key: string) {
+
+    try {
+      if (key.startsWith('self_id:')) {
+        return await getUser(key.replace('self_id:', ''))
+      }
+    } catch (error) {
+      console.error('Error getting user', error);
+    }
+
+
     const cachedData = await redis.get(key);
     if (cachedData) {
       return JSON.parse(cachedData);

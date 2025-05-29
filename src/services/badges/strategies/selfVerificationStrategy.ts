@@ -13,11 +13,10 @@ export class SelfVerificationStrategy extends BaseBadgeStrategy {
 
         const cache_key = `self_id:${this.account.toUpperCase()}`
 
-        const selfData = await redisService.getCachedData(cache_key)       
-        if (!selfData || Object.keys(selfData).length === 0) 
-            return false
-        
-        return true;
+        const selfData = await redisService.getCachedData(cache_key)
+        if (selfData?.nationality?.length > 0)
+            return true
+        return false
 
     }
 }

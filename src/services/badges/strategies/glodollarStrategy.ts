@@ -15,7 +15,7 @@ export class GlodollarStrategy extends BaseBadgeStrategy {
         async () => await this.dune.getLatestResult({ queryId: 4312613, columns: ['address', 'tier'] }),
         86400
       );
-      return dune_response.result?.rows.find((row: any) => eoas.includes(row.address.toLowerCase()))?.tier as number || 0;
+      return dune_response.result?.rows.find((row: any) => eoas.map((eoa) => eoa.toLowerCase()).includes(row.address.toLowerCase()))?.tier as number || 0;
     };
 
     return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, ttl);

@@ -7,6 +7,7 @@ import {
 import { redisService } from '@/services/redis.service';
 
 
+
 export default async function selfVerify(req: Request, res: Response) {
     if (req.method === 'POST') {
         try {
@@ -21,11 +22,14 @@ export default async function selfVerify(req: Request, res: Response) {
             const userId = '0X' + (await getUserIdentifier(publicSignals)).replace(/-/g, '').toUpperCase();
             console.log('Extracted userId:', userId);
 
+            const adminValidators: string[] = ['0x155B63314444c7edC995A74DBc740BBC0A71742D'].map(a => a.toUpperCase());
+            const isAdmin = adminValidators.includes(userId);
+
             const selfBackendVerifier = new SelfBackendVerifier(
                 'prosperity',
                 'https://prosperity-passport-backend-production.up.railway.app/api/self/verify',
                 'hex',
-                false
+                isAdmin
             );
 
             const result = await selfBackendVerifier.verify(proof, publicSignals);

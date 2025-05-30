@@ -1,45 +1,41 @@
-import { BaseBadgeStrategy } from "./badgeStrategy";
-import { redisService } from "../../redis.service";
-import axios from "axios";
+import { BaseBadgeStrategy } from './badgeStrategy';
+import { redisService } from '../../redis.service';
+import axios from 'axios';
 
 type TalentPassport = {
-  passport: {
-    score: number;
-  }
-}
-
-
+  score: {
+    points: number;
+  };
+};
 
 export class TalentScoreStrategy extends BaseBadgeStrategy {
+  async getValue(eoas: string[]): Promise<number> {
+    const cacheKey = `talentScore-${eoas.join(',')}`;
+    const ttl = 3600;
 
-
-    async getValue(eoas: string[]): Promise<number> {
-        const cacheKey = `talentScore-${eoas.join(",")}`;
-        const ttl = 3600;
-
-
-
-        const fetchFunction = async () => {
-            let highestTalentScore = 0;
-            for (const eoa of eoas) {
-                try {
-
-                    const talentPassport = await axios.get<TalentPassport>(`https://api.talentprotocol.com/api/v2/passports/${eoa}`, {
-                        headers: {
-                            "x-api-key": process.env.TALENT_API_KEY!
-                        }
-                    })
-                    if (!talentPassport.data) continue;
-                    if (talentPassport.data.passport.score > highestTalentScore) {
-                        highestTalentScore = talentPassport.data.passport.score;
-                    }
-                } catch (error) {
-                    console.error(`Error fetching talent score for address ${eoa}:`, error);
-                }
+    const fetchFunction = async () => {
+        let highestTalentScore = 0;
+        for (const eoa of eoas) {
+        const talentPassport = await axios.get<TalentPassport>(`https://api.talentprotocol.com/score?id=${eoa}`, {
+            headers: {
+              "x-api-key": process.env.TALENT_API_KEY!
             }
-            return highestTalentScore;
-        };
+          }).catch(error => {
+            if (axios.isAxiosError(error) && error.response?.status === 404) {
+              return;
+            }
+            console.error(`Error fetching talent passport for ${eoa}:`, error);
+            return;
+          });
+          
+          if (talentPassport && talentPassport.data && talentPassport.data.score && talentPassport.data.score.points > highestTalentScore) {
+            highestTalentScore = talentPassport.data.score.points;
+          }
+        }
+        return highestTalentScore;
+      };
+  
 
-        return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, ttl);
-    }
+    return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, ttl);
+  }
 }

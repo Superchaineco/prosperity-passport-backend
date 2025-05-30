@@ -12,7 +12,7 @@ export async function getUser(account: string): Promise<User | null> {
     const client = await pool.connect()
     try {
         const query = `
-      SELECT * FROM users WHERE address = $1
+      SELECT * FROM users WHERE account = $1
     `
         const result = await client.query(query, [account.toUpperCase()])
 

@@ -23,44 +23,39 @@ export class BadgesServices {
 
   public async getCachedBadges(account: string): Promise<any[]> {
     const CACHE_KEY = `cached_badges:${account}`;
-    const OPTIMISTIC_UPDATED_CACHE_KEY = `optimistic_updated_cached_badges:${account}`;
+    const OPTIMISTIC_KEY = `optimistic_updated_cached_badges:${account}`;
 
-    const fetchFunction = async (updateCache = true) => {
+    const fetchFresh = async (): Promise<any[]> => {
       const eoas = await superChainAccountService.getEOAS(account);
       const freshData = await this.getBadges(eoas, account);
-      if (updateCache) {
-        await redisService.setCachedData(CACHE_KEY, freshData, null);
-      }
+      await redisService.setCachedData(CACHE_KEY, freshData, null);
       return freshData;
     };
 
-    const optimisticData = await redisService.getCachedData(OPTIMISTIC_UPDATED_CACHE_KEY);
+    const optimisticData = await redisService.getCachedData(OPTIMISTIC_KEY);
     const cachedData = await redisService.getCachedData(CACHE_KEY);
+
     if (optimisticData && cachedData) {
-      console.log('Optimistic data found for badges. Returning optimistic data...');
-      fetchFunction(false).then((freshData) => {
-        if (JSON.stringify(freshData) !== JSON.stringify(cachedData)) {
-          console.log('Data fetch differs from optimistic data. Updating main cache and clearing optimistic data.');
-          redisService.deleteCachedData(OPTIMISTIC_UPDATED_CACHE_KEY);
-          redisService.setCachedData(CACHE_KEY, freshData, null);
-          return freshData;
-        } else {
-          console.log('Data fetch matches optimistic data. Everything remains the same.');
+      void fetchFresh().then(fresh => {
+        if (JSON.stringify(fresh) !== JSON.stringify(cachedData)) {
+          redisService.setCachedData(CACHE_KEY, fresh, null);
+          redisService.deleteCachedData(OPTIMISTIC_KEY);
         }
-      }).catch((err) => {
-        console.error('Error in badges fetch during comparison with optimistic data:', err);
-      });
+      }).catch(err => console.error('Error fetching fresh data:', err));
       return optimisticData;
     }
 
     if (cachedData) {
-      console.log('Badges cache returned!');
-      fetchFunction();
+      const fresh = await fetchFresh();
+      if (JSON.stringify(fresh) !== JSON.stringify(cachedData)) {
+        return fresh;
+      }
       return cachedData;
     }
 
-    return fetchFunction();
+    return await fetchFresh();
   }
+
 
   public async fetchBadges(account: string) {
     const CACHE_KEY = `user_badges:${account}`;
@@ -84,6 +79,7 @@ export class BadgesServices {
 
   public async getBadges(eoas: string[], account: string): Promise<any[]> {
     const data = await this.fetchBadges(account);
+
     const accountBadgesIds =
       data?.accountBadges.map((accountBadge) => accountBadge.badge.badgeId) ??
       [];
@@ -100,11 +96,15 @@ export class BadgesServices {
     }));
 
     const activeBadges = [
-      ...(data?.accountBadges ?? []).map((badge) => ({
-        ...badge,
-        tier: parseInt(badge.tier),
-        points: parseInt(badge.points),
-      })),
+      ...(data?.accountBadges ?? []).map((badge) => {
+        if (badge.badge.badgeId == '17')
+          console.log('Esta!!!!', badge)
+        return ({
+          ...badge,
+          tier: parseInt(badge.tier),
+          points: parseInt(badge.points),
+        })
+      }),
       ...unclaimedBadges,
     ] as Badge[];
     const promises = activeBadges.flatMap((badge) =>
@@ -125,7 +125,7 @@ export class BadgesServices {
     for (const badge of activeBadges) {
       await this.updateBadgeDataForAccount(eoas, badge, account);
     }
-
+    console.log('QUEDO!!!!', this.badges)
     return this.badges;
   }
 

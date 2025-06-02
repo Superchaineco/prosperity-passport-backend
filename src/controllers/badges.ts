@@ -46,7 +46,7 @@ export async function claimBadges(req: Request, res: Response) {
         const extraData = req.body
         const badgesService = new BadgesServices();
         const eoas = await superChainAccountService.getEOAS(account);
-        const badges = await badgesService.getBadges(eoas, account, extraData);
+        const badges = await badgesService.getBadges(eoas, account, { ...(extraData ?? {}), account });
         const attestationsService = new AttestationsService();
         const totalPoints = badgesService.getTotalPoints(badges);
         const badgeUpdates = badgesService.getBadgeUpdates(badges);

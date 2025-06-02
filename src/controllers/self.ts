@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { getUserIdentifier } from '@selfxyz/core';
 import { redisService } from '@/services/redis.service';
 import { SelfService } from '@/services/badges/self.service';
+import { Console } from 'console';
 
 
 
@@ -99,7 +100,7 @@ export async function getNationalitiesBatch(req: Request, res: Response) {
             });
         }
 
-
+        console.log('Processed addresses:', processedAddresses);
         const redisKeys = processedAddresses.map(address => `self_id:${address}`);
 
 
@@ -117,6 +118,7 @@ export async function getNationalitiesBatch(req: Request, res: Response) {
 
         });
 
+         console.log('Processed addresses:', responseData);
         return res.status(200).json(responseData);
 
     } catch (error) {

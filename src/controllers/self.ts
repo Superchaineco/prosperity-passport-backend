@@ -117,12 +117,10 @@ export async function getNationalitiesBatch(req: Request, res: Response) {
             }
 
         });
-
-         console.log('Processed addresses:', responseData);
+        
         return res.status(200).json(responseData);
 
     } catch (error) {
-        console.error('Error on getNationalitiesBatch:', error);
         return res.status(500).json({
             error: 'Internal error'
         });

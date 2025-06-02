@@ -54,20 +54,18 @@ export default async function selfVerify(req: Request, res: Response) {
 }
 
 export async function selfCheck(req: Request, res: Response) {
-    if (req.query.userId) {
 
-        const selfService = new SelfService()
-        const response = await selfService.selfCheck(req.query.userId as string)
+    const selfService = new SelfService()
+    const response = await selfService.selfCheck(req.query.userId as string, req.query.account as string)
 
-        if (response.check) {
-            return res
-                .status(200)
-                .json(response);
-        }
+    if (response.check) {
         return res
             .status(200)
             .json(response);
     }
+    return res
+        .status(200)
+        .json(response);
 }
 
 interface NationalityResponse {
@@ -117,7 +115,7 @@ export async function getNationalitiesBatch(req: Request, res: Response) {
             }
 
         });
-        
+
         return res.status(200).json(responseData);
 
     } catch (error) {

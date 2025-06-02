@@ -35,6 +35,8 @@ export class RedisService {
       try {
         if (key.startsWith('self_id:')) {
           await createUser({ account: key.replace('self_id:', ''), nationality: data.nationality })
+        } else {
+          await redis.set(key, JSON.stringify(data));
         }
       } catch (error) {
         await redis.set(key, JSON.stringify(data));

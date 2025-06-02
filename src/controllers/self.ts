@@ -14,8 +14,6 @@ export default async function selfVerify(req: Request, res: Response) {
                 .status(400)
                 .json({ message: 'Proof and publicSignals are required' });
         }
-
-
         const userId = await getUserIdentifier(publicSignals);
         console.log('Extracted userId:', userId);
 

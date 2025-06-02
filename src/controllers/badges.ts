@@ -43,7 +43,7 @@ export async function claimBadges(req: Request, res: Response) {
         //     console.error("User is not able to sponsor");
         //     return res.status(500).json({ error: "User is not able to sponsor" });
         // }
-        const extraData = req.body.json()
+        const extraData = req.body
         const badgesService = new BadgesServices();
         const eoas = await superChainAccountService.getEOAS(account);
         const badges = await badgesService.getBadges(eoas, account, extraData);

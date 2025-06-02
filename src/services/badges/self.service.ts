@@ -42,7 +42,7 @@ export class SelfService {
 
     public async selfCheck(userId: string, address: string): Promise<SelfCheckResponse> {
 
-        const cache_pre_key = `self_id_pre:${(userId).toUpperCase()}`;
+        const cache_pre_key = `self_id_pre:${(userId)}`;
         const cache_key = `self_id:${address}`;
         const selfData = await redisService.getCachedData(cache_pre_key) ?? await redisService.getCachedData(cache_key);
 

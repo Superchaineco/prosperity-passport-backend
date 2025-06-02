@@ -12,6 +12,7 @@ export class SelfVerificationStrategy extends BaseBadgeStrategy {
         let selfData = await redisService.getCachedData(cache_key)
         if (!selfData && !extraData.selfUserId)
             return false
+        console.log('Self data:', selfData, 'for account:', account, ' with preid', extraData.selfUserId);
         if (!selfData) {
             const cache_pre_key = `self_id_pre:${extraData.selfUserId}`
             const preSelfData = await redisService.getCachedData(cache_pre_key)

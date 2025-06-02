@@ -30,7 +30,7 @@ routes.post('/relay', relay);
 
 routes.post('/self/verify', selfVerify);
 
-routes.get('/self/check', selfCheck);
+routes.get('/self/check', verifyOwner, selfCheck);
 
 routes.post('/leaderboard/nationalities', getNationalitiesBatch);
 

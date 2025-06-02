@@ -21,13 +21,13 @@ export type ResponseBadge = {
 export class BadgesServices {
   private badges: ResponseBadge[] = [];
 
-  public async getCachedBadges(account: string): Promise<any[]> {
+  public async getCachedBadges(account: string, extraData?: any | undefined): Promise<any[]> {
     const CACHE_KEY = `cached_badges:${account}`;
     const OPTIMISTIC_KEY = `optimistic_updated_cached_badges:${account}`;
 
     const fetchFresh = async (): Promise<any[]> => {
       const eoas = await superChainAccountService.getEOAS(account);
-      const freshData = await this.getBadges(eoas, account);
+      const freshData = await this.getBadges(eoas, account, { ...(extraData ?? {}), account });
       await redisService.setCachedData(CACHE_KEY, freshData, null);
       return freshData;
     };
@@ -77,7 +77,7 @@ export class BadgesServices {
     return fetchFunction();
   }
 
-  public async getBadges(eoas: string[], account: string): Promise<any[]> {
+  public async getBadges(eoas: string[], account: string, extraData: any | undefined): Promise<any[]> {
     const data = await this.fetchBadges(account);
 
     const accountBadgesIds =
@@ -97,8 +97,7 @@ export class BadgesServices {
 
     const activeBadges = [
       ...(data?.accountBadges ?? []).map((badge) => {
-        if (badge.badge.badgeId == '17')
-          console.log('Esta!!!!', badge)
+
         return ({
           ...badge,
           tier: parseInt(badge.tier),
@@ -123,9 +122,9 @@ export class BadgesServices {
     }
 
     for (const badge of activeBadges) {
-      await this.updateBadgeDataForAccount(eoas, badge, account);
+      await this.updateBadgeDataForAccount(eoas, badge, extraData);
     }
-    console.log('QUEDO!!!!', this.badges)
+
     return this.badges;
   }
 
@@ -222,15 +221,13 @@ export class BadgesServices {
   private async updateBadgeDataForAccount(
     eoas: string[],
     badgeData: Badge,
-    account: string
+    extraData: any | undefined
   ) {
     try {
-      const strategy = BadgeStrategyContext.getBadgeStrategy(
-        badgeData.badge.metadata!.name, account
-      );
+      const strategy = BadgeStrategyContext.getBadgeStrategy(badgeData.badge.metadata!.name);
       const badgeResponse = await strategy.calculateTier(
         eoas,
-        badgeData
+        badgeData, extraData
       );
       this.badges.push(badgeResponse);
     } catch (error) {

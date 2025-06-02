@@ -23,7 +23,7 @@ import { TalentScoreStrategy } from './talentScoreStrategy';
 
 
 export class BadgeStrategyContext {
-  static getBadgeStrategy(badgeName: string, account: string): BadgeStrategy {
+  static getBadgeStrategy(badgeName: string): BadgeStrategy {
     switch (badgeName.trim()) {
 
       case "Celo Genesis":
@@ -57,7 +57,7 @@ export class BadgeStrategyContext {
       case "Eco Credit Retirement":
         return new EcoCreditsStrategy()
       case "Self verification":
-        return new SelfVerificationStrategy(account)
+        return new SelfVerificationStrategy()
       case "GreenPill Member":
         return new GreenPillMemberStrategy()
       case "Celo Citizen":

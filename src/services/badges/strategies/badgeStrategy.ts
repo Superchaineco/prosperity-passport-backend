@@ -1,15 +1,15 @@
 import { Badge, ResponseBadge } from '../badges.service';
 export interface BadgeStrategy {
-    calculateTier(eoas: string[], badgeData: Badge): Promise<ResponseBadge>;
+    calculateTier(eoas: string[], badgeData: Badge, extraData: any | undefined): Promise<ResponseBadge>;
 }
 
 export abstract class BaseBadgeStrategy implements BadgeStrategy {
-    abstract getValue(eoas: string[]): Promise<number | boolean>;
+    abstract getValue(eoas: string[], extraData: any | undefined): Promise<number | boolean>;
 
     protected isDecending = false;
 
-    async calculateTier(eoas: string[], badgeData: Badge): Promise<ResponseBadge> {
-        const value = await this.getValue(eoas);
+    async calculateTier(eoas: string[], badgeData: Badge, extraData: any | undefined): Promise<ResponseBadge> {
+        const value = await this.getValue(eoas, extraData);
 
         let claimableTier: number | null = null;
         let claimable = false;
@@ -39,8 +39,8 @@ export abstract class BaseBadgeStrategy implements BadgeStrategy {
         const badgeTiers = badgeData.badge.badgeTiers;
         if (!badgeTiers) throw new Error('No tiers found for badge');
 
-        if(this.isDecending) {
-        for (let i = badgeTiers.length - 1; i >= 0; i--) {
+        if (this.isDecending) {
+            for (let i = badgeTiers.length - 1; i >= 0; i--) {
                 if (value <= badgeTiers[i].metadata!.minValue) {
                     return i + 1;
                 }

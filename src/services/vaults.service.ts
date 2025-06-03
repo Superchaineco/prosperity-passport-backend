@@ -3,10 +3,23 @@ import axios from 'axios';
 import { Contract, formatUnits, JsonRpcProvider } from 'ethers';
 import { RedisService } from './redis.service';
 
+type Vault = {
+  reserve: string;
+  rewards_apr: number;
+  asset: string;
+  symbol: string;
+  decimals: number;
+  image: string | null;
+  depreciated: boolean;
+  min_deposit: number;
+  balance: string;
+  interest_apr: string;
+};
+
 const tokenImages = {
-  WETH: 'https://staging.account.superchain.eco/images/currencies/ethereum.svg',
-  USDC: 'https://staging.account.superchain.eco/images/currencies/usdc.svg',
-  USDT: 'https://staging.account.superchain.eco/images/currencies/usdt.svg',
+  WETH: 'https://pass.celopg.eco/images/currencies/ethereum.svg',
+  cUSD: 'https://pass.celopg.eco/images/currencies/cusd.svg',
+  cEUR: 'https://pass.celopg.eco/images/currencies/ceur.svg',
 };
 
 const RAY_DECIMALS = 27;
@@ -301,6 +314,7 @@ export class VaultsService {
           decimals: Number(reserveData[3]) || 18,
           liquidityIndex: reserveData[12].toString() || '0',
           apr: formatAPR(reserveData[14]),
+          image: tokenImages[reserveData[2]] || null,
         };
       });
     } catch (error) {
@@ -310,6 +324,9 @@ export class VaultsService {
         symbol: tokenSymbols[address],
         name: '',
         decimals: 18,
+        liquidityIndex: '0',
+        apr: '0',
+        image: null,
       }));
     }
   }
@@ -424,24 +441,22 @@ export class VaultsService {
         if (!vaultData) {
           return {
             balance: '0',
-            scaledBalance: '0',
             liquidityIndex,
             decimals: vault.decimals,
             name: vault.name,
           };
         }
 
-        const scaledBalance = formatUnits(
-          vaultData.scaledATokenBalance,
-          vault.decimals
-        );
+        // const scaledBalance = formatUnits(
+        //   vaultData.scaledATokenBalance,
+        //   vault.decimals
+        // );
         const balance = (
-          Number(scaledBalance) * Number(liquidityIndex)
+          Number(vaultData.scaledATokenBalance) * Number(liquidityIndex)
         ).toString();
 
         return {
           balance,
-          scaledBalance,
           liquidityIndex,
           decimals: vault.decimals,
           name: vault.name,
@@ -450,7 +465,6 @@ export class VaultsService {
         console.error(error);
         return {
           balance: '0',
-          scaledBalance: '0',
           liquidityIndex,
           decimals: vault.decimals,
           name: vault.name,
@@ -465,10 +479,10 @@ export class VaultsService {
     );
   }
 
-  public async getVaultsForAccount(account: string) {
+  public async getVaultsForAccount(account: string): Promise<Vault[]> {
     const vaults = await this.getVaultsData();
 
-    const vaultsWithData = await Promise.all(
+    const vaultsWithData: Vault[] = await Promise.all(
       vaults.map(async (vault) => {
         const vaultData = await this.getVaultAPR(vault);
         const balanceData = await this.getVaultBalance(
@@ -479,13 +493,19 @@ export class VaultsService {
 
         return {
           ...vault,
+          apr: vaultData.apr,
+          reserve: vault.reserve,
           balance: balanceData.balance,
-          scaledBalance: balanceData.scaledBalance,
           liquidityIndex: balanceData.liquidityIndex,
           decimals: balanceData.decimals,
           name: balanceData.name,
           interest_apr: vaultData.apr,
           symbol: vaultData.symbol,
+          rewards_apr: 0,
+          asset: vault.reserve,
+          image: tokenImages[vault.symbol] || null,
+          depreciated: false,
+          min_deposit: vault.symbol === 'WETH' ? 0.05 : 100,
         };
       })
     );

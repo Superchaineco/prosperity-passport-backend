@@ -454,10 +454,10 @@ export class VaultsService {
         //   vault.decimals
         // );
         const RAY = BigInt("1000000000000000000000000000");
-        const balance = (
-          (BigInt(vaultData.scaledATokenBalance) * BigInt(liquidityIndex)) / RAY
-        ).toString();
-
+        // const balance = (
+        //   (BigInt(vaultData.scaledATokenBalance) * BigInt(liquidityIndex)) / RAY
+        // ).toString();
+        const balance = formatUnits(BigInt(vaultData.scaledATokenBalance), vault.decimals).toString()
         return {
           balance,
           liquidityIndex,

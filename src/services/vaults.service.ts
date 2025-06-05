@@ -508,7 +508,7 @@ export class VaultsService {
           asset: vault.reserve,
           image: tokenImages[vault.symbol] || null,
           depreciated: false,
-          min_deposit: vault.symbol === 'WETH' ? 0.05 : 1,
+          min_deposit: vault.symbol === 'WETH' ? 0.05 : 10,
         };
       })
     );

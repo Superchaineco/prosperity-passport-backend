@@ -56,7 +56,7 @@ export const ATTESTATOR_SIGNER_PRIVATE_KEY =
   process.env.ATTESTATOR_SIGNER_PRIVATE_KEY!;
 export const JSON_RPC_PROVIDER = config.JSON_RPC_PROVIDER!;
 export const ETHERSCAN_API_KEY = config.ETHERSCAN_API_KEY!;
-export const REDIS_URL = "redis://default:ZGUglRGCeYOMXNKbkuooVtPrRsTiQIur@junction.proxy.rlwy.net:48288";
+export const REDIS_URL = config.REDIS!;
 export const REDIS_PASSWORD = process.env.REDISPASSWORD!;
 export const REDIS_HOST = process.env.REDISHOST!;
 export const REDIS_PORT = Number(process.env.REDISPORT!);

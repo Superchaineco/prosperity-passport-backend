@@ -18,8 +18,8 @@ type Vault = {
 
 const tokenImages = {
   WETH: 'https://pass.celopg.eco/images/currencies/ethereum.svg',
-  cUSD: 'https://pass.celopg.eco/images/currencies/cusd.svg',
-  cEUR: 'https://pass.celopg.eco/images/currencies/ceur.svg',
+  cUSD: 'https://pass.celopg.eco/images/currencies/cUSD.svg',
+  cEUR: 'https://pass.celopg.eco/images/currencies/cEUR.svg',
 };
 
 const RAY_DECIMALS = 27;

@@ -438,6 +438,8 @@ export class VaultsService {
             vault.reserve.toLowerCase()
         );
 
+        console.log(vaultData)
+
         if (!vaultData) {
           return {
             balance: '0',
@@ -451,8 +453,9 @@ export class VaultsService {
         //   vaultData.scaledATokenBalance,
         //   vault.decimals
         // );
+        const RAY = BigInt("1000000000000000000000000000");
         const balance = (
-          Number(vaultData.scaledATokenBalance) * Number(liquidityIndex)
+          (BigInt(vaultData.scaledATokenBalance) * BigInt(liquidityIndex)) / RAY
         ).toString();
 
         return {
@@ -505,7 +508,7 @@ export class VaultsService {
           asset: vault.reserve,
           image: tokenImages[vault.symbol] || null,
           depreciated: false,
-          min_deposit: vault.symbol === 'WETH' ? 0.05 : 100,
+          min_deposit: vault.symbol === 'WETH' ? 0.05 : 1,
         };
       })
     );

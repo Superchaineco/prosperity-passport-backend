@@ -13,6 +13,7 @@ type Vault = {
   depreciated: boolean;
   min_deposit: number;
   balance: string;
+  raw_balance: string;
   interest_apr: string;
 };
 
@@ -443,17 +444,18 @@ export class VaultsService {
         if (!vaultData) {
           return {
             balance: '0',
+            raw_balance: '0',
             liquidityIndex,
             decimals: vault.decimals,
             name: vault.name,
           };
         }
 
-        // const scaledBalance = formatUnits(
-        //   vaultData.scaledATokenBalance,
-        //   vault.decimals
-        // );
         const RAY = BigInt('1000000000000000000000000000');
+        const rawBalance = (
+          (BigInt(vaultData.scaledATokenBalance) * BigInt(liquidityIndex)) /
+          RAY
+        ).toString();
         const balance = formatUnits(
           (BigInt(vaultData.scaledATokenBalance) * BigInt(liquidityIndex)) /
             RAY,
@@ -461,9 +463,9 @@ export class VaultsService {
         );
 
         console.log(vaultData.scaledATokenBalance, liquidityIndex, balance);
-        // const balance = formatUnits(BigInt(vaultData.scaledATokenBalance), vault.decimals).toString()
         return {
           balance,
+          raw_balance: rawBalance,
           liquidityIndex,
           decimals: vault.decimals,
           name: vault.name,
@@ -472,6 +474,7 @@ export class VaultsService {
         console.error(error);
         return {
           balance: '0',
+          raw_balance: '0',
           liquidityIndex,
           decimals: vault.decimals,
           name: vault.name,
@@ -503,6 +506,7 @@ export class VaultsService {
           apr: vaultData.apr,
           reserve: vault.reserve,
           balance: balanceData.balance,
+          raw_balance: balanceData.raw_balance,
           liquidityIndex: balanceData.liquidityIndex,
           decimals: balanceData.decimals,
           name: balanceData.name,
@@ -512,7 +516,7 @@ export class VaultsService {
           asset: vault.reserve,
           image: tokenImages[vault.symbol] || null,
           depreciated: false,
-          min_deposit: vault.symbol === 'WETH' ? 0.05 : 10,
+          min_deposit: vault.symbol === 'WETH' ? 0.05 : 1,
         };
       })
     );

@@ -438,7 +438,7 @@ export class VaultsService {
             vault.reserve.toLowerCase()
         );
 
-        console.log(vaultData)
+        console.log(vaultData);
 
         if (!vaultData) {
           return {
@@ -453,11 +453,15 @@ export class VaultsService {
         //   vaultData.scaledATokenBalance,
         //   vault.decimals
         // );
-        const RAY = BigInt("1000000000000000000000000000");
-        // const balance = (
-        //   (BigInt(vaultData.scaledATokenBalance) * BigInt(liquidityIndex)) / RAY
-        // ).toString();
-        const balance = formatUnits(BigInt(vaultData.scaledATokenBalance), vault.decimals).toString()
+        const RAY = BigInt('1000000000000000000000000000');
+        const balance = formatUnits(
+          (BigInt(vaultData.scaledATokenBalance) * BigInt(liquidityIndex)) /
+            RAY,
+          vault.decimals
+        );
+
+        console.log(vaultData.scaledATokenBalance, liquidityIndex, balance);
+        // const balance = formatUnits(BigInt(vaultData.scaledATokenBalance), vault.decimals).toString()
         return {
           balance,
           liquidityIndex,

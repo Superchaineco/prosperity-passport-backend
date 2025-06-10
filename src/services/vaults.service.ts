@@ -19,8 +19,13 @@ type Vault = {
 
 const tokenImages = {
   WETH: 'https://pass.celopg.eco/images/currencies/ethereum.svg',
-  cUSD: 'https://pass.celopg.eco/images/currencies/cUSD.svg',
-  cEUR: 'https://pass.celopg.eco/images/currencies/cEUR.svg',
+  USDT: 'https://pass.celopg.eco/images/currencies/usdt.svg',
+  // cUSD: 'https://pass.celopg.eco/images/currencies/cUSD.svg',
+  // cEUR: 'https://pass.celopg.eco/images/currencies/cEUR.svg',
+};
+
+const symbolMapping = {
+  'USD₮': 'USDT',
 };
 
 const RAY_DECIMALS = 27;
@@ -38,14 +43,16 @@ export class VaultsService {
   private async getVaultsData() {
     const addresses = [
       '0xD221812de1BD094f35587EE8E174B07B6167D9Af',
-      '0x765DE816845861e75A25fCA122bb6898B8B1282a',
-      '0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73',
+      '0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e',
+      // '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+      // '0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73',
     ];
 
     const tokenSymbols = {
       '0xD221812de1BD094f35587EE8E174B07B6167D9Af': 'WETH',
-      '0x765DE816845861e75A25fCA122bb6898B8B1282a': 'cUSD',
-      '0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73': 'cEUR',
+      '0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e': 'USDT',
+      // '0x765DE816845861e75A25fCA122bb6898B8B1282a': 'cUSD',
+      // '0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73': 'cEUR',
     };
 
     try {
@@ -308,14 +315,16 @@ export class VaultsService {
             reserve[0].toLowerCase() === address.toLowerCase()
         );
 
+        const symbol = symbolMapping[reserveData[2]] || reserveData[2];
+
         return {
           reserve: address,
-          symbol: reserveData[2],
+          symbol,
           name: reserveData[1] || '',
           decimals: Number(reserveData[3]) || 18,
           liquidityIndex: reserveData[12].toString() || '0',
           apr: formatAPR(reserveData[14]),
-          image: tokenImages[reserveData[2]] || null,
+          image: tokenImages[symbol] || null,
         };
       });
     } catch (error) {

@@ -11,7 +11,7 @@ export class SelfService {
             'prosperity',
             'https://prosperity-passport-backend-production.up.railway.app/api/self/verify',
             'hex',
-            true
+            false
         );
 
         const result = await selfBackendVerifier.verify(proof, publicSignals);

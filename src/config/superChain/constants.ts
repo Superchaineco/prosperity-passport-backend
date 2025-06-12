@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { Pool } from 'pg'
+import { Pool } from 'pg';
 dotenv.config();
 
 export const pool = new Pool({
@@ -7,13 +7,12 @@ export const pool = new Pool({
   ssl: {
     rejectUnauthorized: false, // requerido en Railway
   },
-})
-
+});
 
 export enum ENVIRONMENTS {
   development = 'development',
   production = 'production',
-  staging = 'staging'
+  staging = 'staging',
 }
 
 export const ENV =
@@ -46,6 +45,7 @@ const config = {
 // }[ENV];
 
 import SuperChainModuleABI from './abi/SuperChainModule.json';
+import AirdropABI from './abi/Airdrop.json';
 export const SUPER_CHAIN_MODULE_ABI = SuperChainModuleABI;
 export const SUPER_CHAIN_ACCOUNT_MODULE_ADDRESS =
   config.SUPER_CHAIN_ACCOUNT_MODULE_ADDRESS;
@@ -67,10 +67,12 @@ export const COINGECKO_API_KEY = process.env.COINGECKO_API_KEY!;
 export const GELATO_API_KEY = process.env.GELATO_API_KEY!;
 export const SUBGRAPH_API_KEY = process.env.SUBGRAPH_API_KEY!;
 export const WC_PROJECT_ID = process.env.WC_PROJECT_ID!;
-export const DOMAIN = config.DOMAIN.split(',').map(origin => origin.trim());
+export const DOMAIN = config.DOMAIN.split(',').map((origin) => origin.trim());
 export const SESSION_SECRET = process.env.SESSION_SECRET!;
 export const DUNE_API_KEY = process.env.DUNE_API_KEY!;
 export const SAFE_ADDRESS = config.SAFE_ADDRESS;
 export const PIMLICO_API_KEY = process.env.PIMLICO_API_KEY;
 export const SUBGRAPH_URI = process.env.SUBGRAPH_URI!;
 export const BLOCKSCOUT_API_KEY = process.env.BLOCKSCOUT_API_KEY!;
+export const AIRDROP_ADDRESS = process.env.AIRDROP_ADDRESS!;
+export const AIRDROP_ABI = AirdropABI;

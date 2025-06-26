@@ -1,4 +1,5 @@
 import { redis, redisClient } from '../utils/cache';
+import { createFarcaster, getFarcaster } from './farcasterService';
 import { createUser, getUser } from './usersService';
 
 export class RedisService {
@@ -37,6 +38,12 @@ export class RedisService {
             account: key.replace('self_id:', ''),
             nationality: data.nationality,
           });
+        } else if (key.startsWith('farcasterLink')) {
+          await createFarcaster({
+            account: key.replace('farcasterLink-', ''),
+            fid: data.fid,
+            signature: data,
+          });
         } else {
           await redis.set(key, JSON.stringify(data));
         }
@@ -50,6 +57,8 @@ export class RedisService {
     try {
       if (key.startsWith('self_id:')) {
         return await getUser(key.replace('self_id:', ''));
+      } else if (key.startsWith('farcasterLink')) {
+        return await getFarcaster(key.replace('farcasterLink', ''));
       }
     } catch (error) {
       console.error('Error getting user', error);

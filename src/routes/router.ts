@@ -14,6 +14,7 @@ import selfVerify, {
   selfCheck,
 } from '@/controllers/self';
 import { getVaults, refreshVaults } from '@/controllers/vaults';
+import { verifyFarcaster } from '@/controllers/farcaster';
 
 export const routes = Router();
 
@@ -44,5 +45,7 @@ routes.get('/self/check', selfCheck);
 routes.post('/leaderboard/nationalities', getNationalitiesBatch);
 
 routes.post('/user-op-reverse-proxy', verifyReverseProxy, reverseProxy);
+
+routes.post('/farcaster/verify/:account',verifyOwner, verifyFarcaster);
 
 export default routes;

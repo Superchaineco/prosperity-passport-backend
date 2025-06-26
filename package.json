@@ -15,6 +15,7 @@
     "@duneanalytics/client-sdk": "^0.2.4",
     "@ethereum-attestation-service/eas-contracts": "1.2.0-beta.0",
     "@ethereum-attestation-service/eas-sdk": "^2.3.0",
+    "@farcaster/auth-client": "^0.7.0",
     "@gelatonetwork/relay-sdk": "^5.5.6",
     "@privy-io/server-auth": "^1.11.0",
     "@reown/appkit-siwe": "^1.5.2",

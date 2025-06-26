@@ -1,4 +1,3 @@
-import { SUNNY_TOKEN_ADDRESS } from '@/config/superChain/constants';
 import { AirdropService } from '@/services/airdrop.service';
 import { Request, Response } from 'express';
 
@@ -15,7 +14,7 @@ export async function getAirdrop(req: Request, res: Response) {
     );
     const isClaimed = await airdropService.isAirdropClaimed(
       account,
-      SUNNY_TOKEN_ADDRESS
+      '0x471EcE3750Da237f93B8E339c536989b8978a438'
     );
 
     const eligible = airdropData && airdropData.inputs[1] > 0;

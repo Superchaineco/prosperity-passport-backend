@@ -15,6 +15,7 @@ import selfVerify, {
 } from '@/controllers/self';
 import { getVaults, refreshVaults } from '@/controllers/vaults';
 import { verifyFarcaster } from '@/controllers/farcaster';
+import { getAirdrop } from '@/controllers/airdrop';
 
 export const routes = Router();
 
@@ -27,6 +28,8 @@ routes.get('/user/:account/perks', perksByAccount);
 routes.get('/perks/:level', perksByLevel);
 
 routes.get('/user/:account/sponsorship-balance', getBalance);
+
+routes.get('/airdrop/:account', getAirdrop);
 
 routes.post('/user/:account/badges/claim', verifyOwner, claimBadges);
 

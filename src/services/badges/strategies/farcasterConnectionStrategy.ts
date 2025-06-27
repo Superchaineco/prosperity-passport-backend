@@ -10,7 +10,7 @@ export class FarcasterConnectionStrategy extends BaseBadgeStrategy {
         const account = extraData.account
         const cacheKey = `farcasterLink-${account}`;
         const data = await redisService.getCachedData(cacheKey)
-        return data?.signature ? true : false;
+        return data?.state == 'completed' ? true : false;
     }
 
 

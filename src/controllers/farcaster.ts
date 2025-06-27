@@ -29,7 +29,7 @@ export async function verifyFarcaster(req, res) {
     console.log("Saved!!");
     const account = req.params.account;
     const eoas = await superChainAccountService.getEOAS(account);
-    const CACHE_KEY = `farcasterLink-${eoas.join(',')}`;
+    const CACHE_KEY = `farcasterLink-${account}`;
     redisService.setCachedData(CACHE_KEY, req.body, 0)
     return res.json({ success: true });
 }

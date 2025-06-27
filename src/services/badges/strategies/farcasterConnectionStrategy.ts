@@ -11,7 +11,9 @@ export class FarcasterConnectionStrategy extends BaseBadgeStrategy {
         const cacheKey = `farcasterLink-${account}`;
         const data = await redisService.getCachedData(cacheKey)
         console.log('Farcaster data:', data, 'for account:', account);
-        return data?.state == 'completed' ? true : false;
+        const isClaimable = data?.signature.state == 'completed' ? true : false
+        console.log("IsClaimable:", isClaimable)
+        return isClaimable;
     }
 
 

@@ -14,11 +14,12 @@ export async function getFarcaster(account: string): Promise<Farcaster | null> {
     try {
         const query = `SELECT * FROM farcaster WHERE UPPER(account) = $1`
         const result = await client.query(query, [account.toUpperCase()])
-
+        console.log('Farcaster query result:', result.rows.length, 'wtih account:', account)
         if (result.rows.length === 0) return null
 
         const row = result.rows[0]
         row.signature = JSON.parse(row.signature)
+        console.log('Farcaster query result:', row)
         return row as Farcaster
     } catch (err) {
         console.error('Error getting user:', err)

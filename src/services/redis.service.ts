@@ -58,7 +58,7 @@ export class RedisService {
       if (key.startsWith('self_id:')) {
         return await getUser(key.replace('self_id:', ''));
       } else if (key.startsWith('farcasterLink')) {
-        return await getFarcaster(key.replace('farcasterLink', ''));
+        return await getFarcaster(key.replace('farcasterLink-', ''));
       }
     } catch (error) {
       console.error('Error getting user', error);

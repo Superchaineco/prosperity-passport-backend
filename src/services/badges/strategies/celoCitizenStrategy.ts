@@ -22,7 +22,7 @@ export class CeloCitizenStrategy extends BaseBadgeStrategy {
     const csvData = await this.loadCsvData('src/data/celoCitizen.csv');
     for (const eoa of eoas) {
       const celoCitizen = csvData.find(
-        (row) => row.Address.toLowerCase() === eoa.toLowerCase()
+        (row) => row.Address && row.Address.toLowerCase() === eoa.toLowerCase()
       );
       if (celoCitizen) {
         return parseInt(celoCitizen.Amount);

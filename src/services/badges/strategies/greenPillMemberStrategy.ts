@@ -22,7 +22,7 @@ export class GreenPillMemberStrategy extends BaseBadgeStrategy {
     const csvData = await this.loadCsvData('src/data/greenPillMember.csv');
     for (const eoa of eoas) {
       const greenPillMember = csvData.find(
-        (row) => row.Address.toLowerCase() === eoa.toLowerCase()
+        (row) => row.Address && row.Address.toLowerCase() === eoa.toLowerCase()
       );
       if (greenPillMember) {
         return parseInt(greenPillMember.Tier);

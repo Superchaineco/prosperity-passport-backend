@@ -14,7 +14,8 @@ export class EcoCreditsStrategy extends BaseBadgeStrategy {
       fs.createReadStream(filePath)
         .pipe(csv())
         .on('data', (data: CsvRow) => results.push(data))
-        .on('end', () => resolve(results));
+        .on('end', () => resolve(results))
+        .on('error', reject);
     });
   }
 
@@ -24,7 +25,7 @@ export class EcoCreditsStrategy extends BaseBadgeStrategy {
 
     for (const eoa of eoas) {
       const ecoCredits = csvData.find(
-        (row) => row.Address.toLowerCase() === eoa.toLowerCase()
+        (row) => row.Address && row.Address.toLowerCase() === eoa.toLowerCase()
       );
       if (ecoCredits) {
         totalAmount += parseFloat(ecoCredits.Amount);

@@ -22,7 +22,7 @@ export class CeloEventsPoapStrategy extends BaseBadgeStrategy {
     const csvData = await this.loadCsvData('src/data/celoEventPoap.csv');
     for (const eoa of eoas) {
       const celoEventsPoap = csvData.find(
-        (row) => row.Address.toLowerCase() === eoa.toLowerCase()
+        (row) => row.Address && row.Address.toLowerCase() === eoa.toLowerCase()
       );
       if (celoEventsPoap) {
         return parseInt(celoEventsPoap.POAPcollected);

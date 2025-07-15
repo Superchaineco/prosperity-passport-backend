@@ -76,3 +76,4 @@ export const SUBGRAPH_URI = process.env.SUBGRAPH_URI!;
 export const BLOCKSCOUT_API_KEY = process.env.BLOCKSCOUT_API_KEY!;
 export const AIRDROP_ADDRESS = process.env.AIRDROP_ADDRESS!;
 export const AIRDROP_ABI = AirdropABI;
+export const RPC_PROVIDER = process.env.RPC_PROVIDER

@@ -16,6 +16,7 @@ import selfVerify, {
 import { getVaults, refreshVaults } from '@/controllers/vaults';
 import { verifyFarcaster } from '@/controllers/farcaster';
 import { getAirdrop } from '@/controllers/airdrop';
+import { rpcReverseProxy, verifyInternalRequest } from '@/controllers/rpcProxy';
 
 export const routes = Router();
 
@@ -49,6 +50,8 @@ routes.post('/leaderboard/nationalities', getNationalitiesBatch);
 
 routes.post('/user-op-reverse-proxy', verifyReverseProxy, reverseProxy);
 
-routes.post('/farcaster/verify/:account',verifyOwner, verifyFarcaster);
+routes.post('/farcaster/verify/:account', verifyOwner, verifyFarcaster);
+
+routes.use('/rpc', verifyInternalRequest, rpcReverseProxy);
 
 export default routes;

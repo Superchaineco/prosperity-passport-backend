@@ -6,17 +6,17 @@ export class RedisService {
   public async getCachedDataWithCallback<T>(
     key: string,
     fetchFunction: () => Promise<T>,
-    ttl: number
+    ttl: number,
+    log: boolean = false
   ): Promise<T> {
     try {
       const cachedData = await redis.get(key);
       if (cachedData) {
-        console.info(`Cache hit for key: ${key}`);
+        if (log) console.info(`Cache hit for key: ${key}`);
         return JSON.parse(cachedData);
       }
 
       const data = await fetchFunction();
-
       if (ttl > 0) {
         await redis.set(key, JSON.stringify(data), 'EX', ttl);
       } else {

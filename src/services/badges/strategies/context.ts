@@ -16,6 +16,7 @@ import { GitcoinDonationsStrategy } from './gitcoinDonationsStrategy';
 import { GivethDonationsStrategy } from './givethDonationsStrategy';
 import { GlodollarStrategy } from './glodollarStrategy';
 import { GreenPillMemberStrategy } from './greenPillMemberStrategy';
+import { LetsGrowDaoStrategy } from './letsGrowDaoStrategy';
 import { ProofOfShipStrategy } from './proofOfShipStrategy';
 import { ReFiDaoMemberStrategy } from './refiDaoMemberStrategy';
 import { SelfVerificationStrategy } from './selfVerificationStrategy';
@@ -67,6 +68,8 @@ export class BadgeStrategyContext {
         return new CeloEventsPoapStrategy()
       case "Farcaster Connection":
         return new FarcasterConnectionStrategy()
+        case "Let’s Grow Contributor":
+        return new LetsGrowDaoStrategy()
       default:
         throw new Error(`Badge strategy ${badgeName} not found`);
     }

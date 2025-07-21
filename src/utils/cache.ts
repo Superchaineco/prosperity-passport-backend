@@ -2,6 +2,11 @@ import Redis from 'ioredis';
 import { REDIS_URL } from '../config/superChain/constants';
 import { createClient } from 'redis';
 
+const redisWorker = new Redis(REDIS_URL + '?family=0', {
+  maxRetriesPerRequest: null,
+  enableOfflineQueue: true,
+});
+
 const redis = new Redis(REDIS_URL + '?family=0');
 
 // This is technical debt, we should use a redis client that supports the JSON.GET command
@@ -33,4 +38,4 @@ redis
     console.error('Redis connection failed:', err);
   });
 
-export { redis, redisClient };
+export { redis, redisClient, redisWorker };

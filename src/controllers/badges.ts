@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { BadgesServices } from "../services/badges/badges.service";
 import { superChainAccountService } from "../services/superChainAccount.service";
 //import { isAbleToSponsor } from "../services/sponsorship.service";
+import { attestQueueService } from "@/services/badges/queue/attestQueue.service";
 import { AttestationsService } from "../services/attestations.service";
 import { redisService } from "@/services/redis.service";
 
@@ -51,12 +52,18 @@ export async function claimBadges(req: Request, res: Response) {
         const totalPoints = badgesService.getTotalPoints(badges);
         const badgeUpdates = badgesService.getBadgeUpdates(badges);
 
-        const response = await attestationsService.attest(
+        const response = await attestQueueService.queueAndWait({
             account,
             totalPoints,
             badges,
             badgeUpdates,
-        );
+        }, true);
+        // const response = await attestationsService.attest(
+        //     account,
+        //     totalPoints,
+        //     badges,
+        //     badgeUpdates,
+        // );
         const cacheKey = `user_badges:${account}`;
         await redisService.deleteCachedData(cacheKey);
 

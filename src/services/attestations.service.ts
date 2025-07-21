@@ -4,6 +4,7 @@ import { ethers, JsonRpcProvider, Wallet, ZeroAddress, zeroPadValue } from 'ethe
 import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import {
   ATTESTATOR_SIGNER_PRIVATE_KEY,
+  BADGES_RPC_URL,
   EAS_CONTRACT_ADDRESS,
   JSON_RPC_PROVIDER,
   PIMLICO_API_KEY,
@@ -13,7 +14,7 @@ import {
 import { superChainAccountService } from './superChainAccount.service';
 import { redisService } from './redis.service';
 import { ResponseBadge } from './badges/badges.service';
-import Safe, { OnchainAnalyticsProps } from '@safe-global/protocol-kit';
+import Safe, { encodeMultiSendData, OnchainAnalyticsProps } from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
 import Safe4337Pack from '@safe-global/relay-kit/dist/src/packs/safe-4337/Safe4337Pack';
 import { MetaTransactionData, OperationType } from '@safe-global/types-kit';
@@ -120,6 +121,124 @@ export class AttestationsService {
     }
   }
 
+    async createSafeTransactions(txDatas: any[]) {
+    const safeTransactions: MetaTransactionData[] = [];
+    for (const txData of txDatas) {
+      const data = this.eas.interface.encodeFunctionData('attest', [txData]);
+
+      const safeTransactionData: MetaTransactionData = {
+        to: this.easContractAddress,
+        value: '0',
+        data: data,
+      };
+      safeTransactions.push(safeTransactionData);
+    }
+    return safeTransactions;
+  }
+
+
+  public async batchAttest(
+    batchData: {
+      account: string;
+      totalPoints: number;
+      badges: ResponseBadge[];
+      badgeUpdates: { badgeId: number; level: number; points: number }[];
+    }[]
+  ) {
+    const onchainAnalytics: OnchainAnalyticsProps = {
+      project: 'SuperAccounts',
+      platform: 'Web',
+    };
+
+    console.log(BADGES_RPC_URL, SAFE_ADDRESS)
+    // @ts-expect-error ESM import
+    const safeSdk = await Safe.default.init({
+      provider: BADGES_RPC_URL,
+      signer: ATTESTATOR_SIGNER_PRIVATE_KEY,
+      safeAddress: SAFE_ADDRESS,
+      onchainAnalytics,
+    });
+
+    const txDatas = [];
+    for (const data of batchData) {
+      console.log('Attesting:', data.account);
+      const encodedData = this.schemaEncoder.encodeData([
+        {
+          name: 'badges',
+          value: data.badgeUpdates,
+          type: '(uint256,uint256)[]',
+        },
+      ]);
+
+      txDatas.push({
+        schema: SUPER_CHAIN_ATTESTATION_SCHEMA,
+        data: {
+          recipient: data.account,
+          data: encodedData,
+          expirationTime: BigInt(0),
+          value: BigInt(0),
+          refUID: ethers.ZeroHash,
+          revocable: false,
+        },
+      });
+    }
+
+    const safeTransactions = await this.createSafeTransactions(txDatas);
+
+    const safeTransaction = await safeSdk.createTransaction({
+      transactions: safeTransactions,
+    });
+    const multiSendData = encodeMultiSendData(safeTransactions);
+    console.log(
+      '🧾🧾🧾🧾🧾 Calldata sent to Safe (batch multiSend):',
+      multiSendData
+    );
+
+    try {
+      const executeTxResponse = await safeSdk.executeTransaction(
+        safeTransaction
+      );
+
+      await this.provider.waitForTransaction(executeTxResponse.hash, 1);
+
+      await Promise.all(
+        batchData.map(
+          async (data) =>
+            await this.claimBadgesOptimistically(
+              data.account,
+              data.badgeUpdates
+            )
+        )
+      );
+
+      const responses = await Promise.all(
+        batchData.map(async (data) => {
+          const isLevelUp = await superChainAccountService.getIsLevelUp(
+            data.account,
+            data.totalPoints
+          );
+
+          const updatedBadges = data.badges.filter((badge) =>
+            data.badgeUpdates.some((update) => update.badgeId === badge.badgeId)
+          );
+
+          return {
+            account: data.account,
+            hash: executeTxResponse.hash,
+            isLevelUp,
+            totalPoints: data.totalPoints,
+            badgeUpdates: data.badgeUpdates,
+            updatedBadges,
+          };
+        })
+      );
+
+      return responses;
+    } catch (e) {
+      console.error('Unexpected error executing transaction with SAFE:', e);
+      throw e;
+    }
+  }
   public async attest(
     account: string,
     totalPoints: number,

@@ -2,6 +2,7 @@ import { generateNonce } from "siwe";
 
 import { WC_PROJECT_ID as projectId } from "../config/superChain/constants";
 import { getAddressFromMessage, getChainIdFromMessage, verifySignature as veriftSiweSignature } from "@reown/appkit-siwe";
+import { signJwt, verifyJwt } from "@/utils/jwt";
 export function getNonce(_, res) {
     res.setHeader('Content-Type', 'text/plain');
     res.send(generateNonce());
@@ -46,8 +47,10 @@ export async function verifySignature(req, res) {
         }
 
 
-        req.session.siwe = { address, chainId };
-        req.session.save(() => res.status(200).send(true));
+        // req.session.siwe = { address, chainId };
+        // req.session.save(() => res.status(200).send(true));
+        const token = signJwt({ address, chainId });
+        res.status(200).json({ token });
         console.log('Success verify', req.session.siwe)
 
     } catch (e: any) {
@@ -59,14 +62,33 @@ export async function verifySignature(req, res) {
 }
 
 
+// export async function getSession(req, res) {
+//     res.setHeader('Content-Type', 'application/json');
+//     console.debug('Session', req.session);
+//     res.send(req.session.siwe);
+// }
+
+// export async function signOut(req, res) {
+//     req.session.siwe = null;
+//     req.session.nonce = null;
+//     req.session.save(() => res.send({}));
+// }
+
 export async function getSession(req, res) {
-    res.setHeader('Content-Type', 'application/json');
-    console.debug('Session', req.session);
-    res.send(req.session.siwe);
+  const auth = req.headers.authorization;
+  if (!auth?.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Missing token" });
+  }
+
+  try {
+    const token = auth.slice(7);
+    const payload = verifyJwt(token);
+    res.json(payload);
+  } catch {
+    res.status(401).json({ message: "Invalid token" });
+  }
 }
 
-export async function signOut(req, res) {
-    req.session.siwe = null;
-    req.session.nonce = null;
-    req.session.save(() => res.send({}));
+export async function signOut(_, res) {
+  res.json({ success: true }); 
 }

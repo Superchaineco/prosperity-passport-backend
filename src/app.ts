@@ -25,21 +25,21 @@ app.use(
 );
 
 app.use(express.json());
-app.use(
-  Session({
-    name: 'Super-account-SIWE',
-    secret: SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: new RedisStore({ client: redis, prefix: 'super-account-siwe:' }),
-    cookie: {
-      secure: ENV === ENVIRONMENTS.development ? false : true,
-      sameSite: 'none',
-      maxAge: 7 * 24 * 3600 * 1000,
-    },
-    rolling: true,
-  })
-);
+// app.use(
+//   Session({
+//     name: 'Super-account-SIWE',
+//     secret: SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     store: new RedisStore({ client: redis, prefix: 'super-account-siwe:' }),
+//     cookie: {
+//       secure: ENV === ENVIRONMENTS.development ? false : true,
+//       sameSite: 'none',
+//       maxAge: 7 * 24 * 3600 * 1000,
+//     },
+//     rolling: true,
+//   })
+// );
 
 app.set('trust proxy', 1);
 app.use(morgan('tiny'));

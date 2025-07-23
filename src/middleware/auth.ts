@@ -10,7 +10,7 @@ export async function verifyOwner(req: Request, res: Response, next: NextFunctio
     }
 
     try {
-        const { address } = verifySession(req, res);
+        const { address } = verifySession(req);
 
         const account = req.params.account as string;
 
@@ -39,7 +39,7 @@ export async function verifyReverseProxy(req: Request, res: Response, next: Next
     }
 
     try {
-        const { address } = verifySession(req, res);
+        const { address } = verifySession(req);
         if (req.body.method == "eth_sendUserOperation") {
             const account = req.body.params[0].sender;
             const isOwner = await superChainAccountService.isOwnerOfSmartAccount(address, account);

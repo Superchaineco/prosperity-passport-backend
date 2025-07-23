@@ -16,7 +16,7 @@ import { redis } from './utils/cache';
 
 const app = express();
 console.debug('ENV', ENV);
-
+app.use(express.json());
 
 const corsOptions = {
   origin(origin, callback) {
@@ -35,8 +35,13 @@ app.use(
   cors(corsOptions)
 );
 app.options('*', cors(corsOptions));
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    console.log('[CORS] Preflight from', req.headers.origin);
+  }
+  next();
+});
 
-app.use(express.json());
 // app.use(
 //   Session({
 //     name: 'Super-account-SIWE',

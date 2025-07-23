@@ -19,7 +19,14 @@ console.debug('ENV', ENV);
 
 
 const corsOptions = {
-  origin: DOMAIN,
+  origin(origin, callback) {
+    if (!origin || DOMAIN.includes(origin)) {
+      callback(null, origin);
+    } else {
+      console.warn('[CORS] Bloqueado:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   // credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],

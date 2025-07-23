@@ -17,14 +17,17 @@ import { redis } from './utils/cache';
 const app = express();
 console.debug('ENV', ENV);
 
+
+const corsOptions = {
+  origin: DOMAIN,
+  // credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
 app.use(
-  cors({
-    origin: DOMAIN,
-    // credentials: true,
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
+  cors(corsOptions)
 );
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
 // app.use(

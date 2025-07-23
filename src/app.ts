@@ -20,7 +20,9 @@ console.debug('ENV', ENV);
 app.use(
   cors({
     origin: DOMAIN,
-    credentials: true,
+    // credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 

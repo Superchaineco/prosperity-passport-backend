@@ -51,11 +51,12 @@ export async function verifySignature(req, res) {
         // req.session.save(() => res.status(200).send(true));
         const token = signJwt({ address, chainId });
         res.status(200).json({ token });
-        console.log('Success verify', req.session.siwe)
+        console.log('[verifySignature] Success:', { address, chainId });
+        //console.log('Success verify', req.session.siwe)
 
     } catch (e: any) {
         console.error(e)
-        req.session.save(() => res.status(500).json({ message: e.message }));
+        res.status(500).json({ message: e.message })
     }
 }
 
@@ -73,20 +74,20 @@ export async function verifySignature(req, res) {
 // }
 
 export async function getSession(req, res) {
-  const auth = req.headers.authorization;
-  if (!auth?.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Missing token" });
-  }
+    const auth = req.headers.authorization;
+    if (!auth?.startsWith("Bearer ")) {
+        return res.status(401).json({ message: "Missing token" });
+    }
 
-  try {
-    const token = auth.slice(7);
-    const payload = verifyJwt(token);
-    res.json(payload);
-  } catch {
-    res.status(401).json({ message: "Invalid token" });
-  }
+    try {
+        const token = auth.slice(7);
+        const payload = verifyJwt(token);
+        res.json(payload);
+    } catch {
+        res.status(401).json({ message: "Invalid token" });
+    }
 }
 
 export async function signOut(_, res) {
-  res.json({ success: true }); 
+    res.json({ success: true });
 }

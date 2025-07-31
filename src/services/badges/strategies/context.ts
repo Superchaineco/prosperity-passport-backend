@@ -7,6 +7,7 @@ import { CeloEventsPoapStrategy } from './celoEventsPoapStrategy';
 import { CeloGenesisStrategy } from './celoGenesisStrategy';
 import { CeloGovernanceGuardianStrategy } from './celoGovernanceGuardianStrategy';
 import { CeloRegionalLeadStrategy } from './celoRegionalLeadStrategy';
+import { CeloSeasonedTransactionsStrategy } from './celoSeasonedTransactions';
 import { CeloStewardsStrategy } from './celoStewardsStrategy';
 import { CeloTransactionsStrategy } from './celoTransactionsStrategy';
 import { CeloVotesStrategy } from './celoVotesStrategy';
@@ -68,8 +69,10 @@ export class BadgeStrategyContext {
         return new CeloEventsPoapStrategy()
       case "Farcaster Connection":
         return new FarcasterConnectionStrategy()
-        case "Let’s Grow Contributor":
+      case "Let’s Grow Contributor":
         return new LetsGrowDaoStrategy()
+      case "S1 Transactions":
+        return new CeloSeasonedTransactionsStrategy("S1")
       default:
         throw new Error(`Badge strategy ${badgeName} not found`);
     }

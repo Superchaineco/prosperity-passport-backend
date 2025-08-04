@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { VaultsService } from '../services/vaults.service';
+import { VaultsService } from '../services/vaults/vaults.service';
 import { redisService } from '../services/redis.service';
 
 export async function getVaults(req: Request, res: Response) {

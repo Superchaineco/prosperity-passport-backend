@@ -16,6 +16,7 @@ import { FarcasterConnectionStrategy } from './farcasterConnectionStrategy';
 import { GitcoinDonationsStrategy } from './gitcoinDonationsStrategy';
 import { GivethDonationsStrategy } from './givethDonationsStrategy';
 import { GlodollarStrategy } from './glodollarStrategy';
+import { GovContributorStrategy } from './govContributorStrategy';
 import { GreenPillMemberStrategy } from './greenPillMemberStrategy';
 import { LetsGrowDaoStrategy } from './letsGrowDaoStrategy';
 import { ProofOfShipStrategy } from './proofOfShipStrategy';
@@ -73,6 +74,8 @@ export class BadgeStrategyContext {
         return new LetsGrowDaoStrategy()
       case "S1 Transactions":
         return new CeloSeasonedTransactionsStrategy("S1")
+      case "S0 Gov Contributor":
+        return new GovContributorStrategy("S0")
       default:
         throw new Error(`Badge strategy ${badgeName} not found`);
     }

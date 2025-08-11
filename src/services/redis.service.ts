@@ -13,7 +13,7 @@ export class RedisService {
       const cachedData = await redis.get(key);
       if (cachedData) {
         if (log) console.info(`Cache hit for key: ${key}`);
-        return JSON.parse(cachedData);
+        // return JSON.parse(cachedData);
       }
 
       const data = await fetchFunction();

@@ -41,7 +41,7 @@ export class StCeloStrategy implements VaultStrategy {
       }
 
       // Mock APR for stCELO
-      const mockAPR = '8.5'; // 8.5% APR
+      const mockAPR = '1.85'; // 8.5% APR
 
       return {
         apr: mockAPR,
@@ -102,6 +102,7 @@ export class StCeloStrategy implements VaultStrategy {
 
       // Fetch real user balance
       const rawBalance = await stCeloContract.balanceOf(account);
+      console.debug(`Raw balance for account ${account}:`, rawBalance.toString());
       const decimals = await stCeloContract.decimals();
 
       // Format balance

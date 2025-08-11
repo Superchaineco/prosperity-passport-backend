@@ -1,11 +1,12 @@
 import { JsonRpcProvider, Contract, formatUnits } from 'ethers';
 import { JSON_RPC_PROVIDER } from '../../../config/superChain/constants';
-
-export interface VaultStrategy {
-  getVaultsData(): Promise<any[]>;
-  getVaultAPR(vault: any): Promise<any>;
-  getVaultBalance(vault: any, account: string, liquidityIndex: string): Promise<any>;
-}
+import {
+  VaultStrategy,
+  VaultBase,
+  APRData,
+  BalanceData,
+  StrategyContext,
+} from './strategy.types';
 
 const RAY_DECIMALS = 27;
 function formatAPR(rayValue: bigint) {
@@ -17,7 +18,7 @@ const symbolMapping = {
 };
 
 export class AaveStrategy implements VaultStrategy {
-  async getVaultsData() {
+  async getVaultsData(): Promise<VaultBase[]> {
     const addresses = [
       '0xD221812de1BD094f35587EE8E174B07B6167D9Af',
       '0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e',
@@ -26,7 +27,7 @@ export class AaveStrategy implements VaultStrategy {
     const tokenSymbols = {
       '0xD221812de1BD094f35587EE8E174B07B6167D9Af': 'WETH',
       '0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e': 'USDT',
-    };
+    } as Record<string, string>;
 
     try {
       const provider = new JsonRpcProvider(JSON_RPC_PROVIDER);
@@ -292,54 +293,66 @@ export class AaveStrategy implements VaultStrategy {
 
         return {
           reserve: address,
+          asset: address,
           symbol,
-          name: reserveData[1] || '',
+          name: symbol,
           decimals: Number(reserveData[3]) || 18,
-          liquidityIndex: reserveData[12].toString() || '0',
-          apr: formatAPR(reserveData[14]),
           image: null,
-        };
+          metadata: {
+            liquidityIndex: reserveData[12]?.toString() || '0',
+            apr: formatAPR((reserveData[14] as bigint) ?? BigInt(0)),
+          },
+        } as VaultBase;
       });
     } catch (error) {
       console.error('Error getting vaults data:', error);
-      return addresses.map((address) => ({
-        reserve: address,
-        symbol: tokenSymbols[address],
-        name: '',
-        decimals: 18,
-        liquidityIndex: '0',
-        apr: '0',
-        image: null,
-      }));
+      return addresses.map(
+        (address) =>
+          ({
+            reserve: address,
+            symbol: tokenSymbols[address],
+            name: '',
+            decimals: 18,
+            image: null,
+            metadata: {
+              liquidityIndex: '0',
+              apr: '0',
+            },
+          } as VaultBase)
+      );
     }
   }
 
-  async getVaultAPR(vault: any) {
+  async getVaultAPR(vault: VaultBase): Promise<APRData> {
     try {
       if (!vault) {
         return {
           apr: '0',
-          symbol: vault.symbol,
-          liquidityIndex: '0',
+          symbol: 'UNKNOWN',
+          metadata: { liquidityIndex: '0' },
         };
       }
 
       return {
-        apr: vault.apr,
+        apr: vault.metadata?.apr ?? '0',
         symbol: vault.symbol,
-        liquidityIndex: vault.liquidityIndex,
+        metadata: { liquidityIndex: vault.metadata?.liquidityIndex ?? '0' },
       };
     } catch (error: any) {
       console.error(error.message);
       return {
         apr: '0',
-        symbol: vault.symbol,
-        liquidityIndex: '0',
+        symbol: vault?.symbol ?? 'UNKNOWN',
+        metadata: { liquidityIndex: '0' },
       };
     }
   }
 
-  async getVaultBalance(vault: any, account: string, liquidityIndex: string) {
+  async getVaultBalance(
+    vault: VaultBase,
+    account: string,
+    context?: StrategyContext
+  ): Promise<BalanceData> {
     try {
       const provider = new JsonRpcProvider(JSON_RPC_PROVIDER);
 
@@ -400,19 +413,21 @@ export class AaveStrategy implements VaultStrategy {
 
       const vaultData = userReservesData[0].find(
         (reserve: any) =>
-          reserve.underlyingAsset.toLowerCase() ===
-          vault.reserve.toLowerCase()
+          reserve.underlyingAsset.toLowerCase() === vault.reserve.toLowerCase()
       );
 
-      console.log(vaultData);
+      const liquidityIndex =
+        (context?.liquidityIndex as string) ??
+        vault.metadata?.liquidityIndex ??
+        '0';
 
       if (!vaultData) {
         return {
           balance: '0',
           raw_balance: '0',
-          liquidityIndex,
           decimals: vault.decimals,
           name: vault.name,
+          metadata: { liquidityIndex },
         };
       }
 
@@ -422,27 +437,29 @@ export class AaveStrategy implements VaultStrategy {
         RAY
       ).toString();
       const balance = formatUnits(
-        (BigInt(vaultData.scaledATokenBalance) * BigInt(liquidityIndex)) /
-          RAY,
+        (BigInt(vaultData.scaledATokenBalance) * BigInt(liquidityIndex)) / RAY,
         vault.decimals
       );
 
-      console.log(vaultData.scaledATokenBalance, liquidityIndex, balance);
       return {
         balance,
         raw_balance: rawBalance,
-        liquidityIndex,
         decimals: vault.decimals,
         name: vault.name,
+        metadata: { liquidityIndex },
       };
     } catch (error: any) {
       console.error(error);
+      const liquidityIndex =
+        (context?.liquidityIndex as string) ??
+        vault.metadata?.liquidityIndex ??
+        '0';
       return {
         balance: '0',
         raw_balance: '0',
-        liquidityIndex,
         decimals: vault.decimals,
         name: vault.name,
+        metadata: { liquidityIndex },
       };
     }
   }

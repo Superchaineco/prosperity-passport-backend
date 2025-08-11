@@ -1,10 +1,12 @@
 import { RedisService } from '../redis.service';
-import { AaveStrategy, VaultStrategy } from './strategies/aave.strategy';
+import { AaveStrategy } from './strategies/aave.strategy';
+import { StCeloStrategy } from './strategies/stcelo.strategy';
+import { VaultStrategy } from './strategies/strategy.types';
 
 type Vault = {
   reserve: string;
-  rewards_apr: number;
   asset: string;
+  rewards_apr: number;
   symbol: string;
   decimals: number;
   image: string | null;
@@ -13,30 +15,57 @@ type Vault = {
   balance: string;
   raw_balance: string;
   interest_apr: string;
+  // origin strategy
+  _strategy?: string;
 };
 
 const tokenImages = {
   WETH: 'https://pass.celopg.eco/images/currencies/ethereum.svg',
   USDT: 'https://pass.celopg.eco/images/currencies/usdt.svg',
+  CELO: 'https://pass.celopg.eco/images/currencies/celo.svg',
 };
 
 export class VaultsService {
   private redisService: RedisService;
-  private strategy: VaultStrategy;
+  // Multiple strategies support
+  private strategies: { name: string; instance: VaultStrategy }[];
 
   constructor(redisService: RedisService) {
     this.redisService = redisService;
-    this.strategy = new AaveStrategy(); // Default strategy
+    // Register available strategies
+    this.strategies = [
+      { name: 'aave', instance: new AaveStrategy() },
+      { name: 'stcelo', instance: new StCeloStrategy() },
+    ];
   }
 
   private async getVaultsData() {
-    return this.strategy.getVaultsData();
+    // Fetch and tag vaults from all strategies
+    const all = await Promise.all(
+      this.strategies.map(async (s) => {
+        try {
+          const data = await s.instance.getVaultsData();
+          return data.map((v: any) => ({ ...v, _strategy: s.name }));
+        } catch (e) {
+          console.error(`Error loading vaults from strategy ${s.name}`, e);
+          return [];
+        }
+      })
+    );
+    return all.flat();
+  }
+
+  private getStrategyForVault(vault: any): VaultStrategy | undefined {
+    const stratName = vault._strategy;
+    return this.strategies.find((s) => s.name === stratName)?.instance;
   }
 
   private async getVaultAPR(vault: any) {
+    const strategy = this.getStrategyForVault(vault);
+    if (!strategy) return { apr: '0', symbol: vault.symbol, metadata: {} };
     const cache_key = `vault_apr_${vault.reserve}`;
     const fetchFunction = async () => {
-      return this.strategy.getVaultAPR(vault);
+      return strategy.getVaultAPR(vault);
     };
 
     return this.redisService.getCachedDataWithCallback(
@@ -49,11 +78,14 @@ export class VaultsService {
   private async getVaultBalance(
     vault: any,
     account: string,
-    liquidityIndex: string
+    context?: Record<string, any>
   ) {
+    const strategy = this.getStrategyForVault(vault);
+    if (!strategy)
+      return { balance: '0', raw_balance: '0', decimals: 18, name: vault.name, metadata: {} };
     const cache_key = `vault_balance_${vault.reserve}_${account}`;
     const fetchFunction = async () => {
-      return this.strategy.getVaultBalance(vault, account, liquidityIndex);
+      return strategy.getVaultBalance(vault, account, context);
     };
 
     return this.redisService.getCachedDataWithCallback(
@@ -68,30 +100,30 @@ export class VaultsService {
 
     const vaultsWithData: Vault[] = await Promise.all(
       vaults.map(async (vault) => {
-        const vaultData = await this.getVaultAPR(vault);
+        const aprData = await this.getVaultAPR(vault);
         const balanceData = await this.getVaultBalance(
           vault,
           account,
-          vaultData.liquidityIndex
+          aprData.metadata
         );
 
         return {
           ...vault,
-          apr: vaultData.apr,
+          apr: aprData.apr,
           reserve: vault.reserve,
+          asset: vault.asset || vault.reserve,
           balance: balanceData.balance,
           raw_balance: balanceData.raw_balance,
-          liquidityIndex: balanceData.liquidityIndex,
           decimals: balanceData.decimals,
           name: balanceData.name,
-          interest_apr: vaultData.apr,
-          symbol: vaultData.symbol,
+          interest_apr: aprData.apr,
+          symbol: aprData.symbol,
           rewards_apr: 0,
-          asset: vault.reserve,
           image: tokenImages[vault.symbol] || null,
           depreciated: false,
-          min_deposit: vault.symbol === 'WETH' ? 0.05 : 10,
-        };
+          min_deposit: vault.symbol === 'WETH' ? 0.05 : 0.1,
+          _strategy: vault._strategy,
+        } as Vault;
       })
     );
 

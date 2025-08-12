@@ -20,8 +20,8 @@ const symbolMapping = {
 export class AaveStrategy implements VaultStrategy {
   async getVaultsData(): Promise<VaultBase[]> {
     const addresses = [
-      '0xD221812de1BD094f35587EE8E174B07B6167D9Af',
       '0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e',
+      '0xD221812de1BD094f35587EE8E174B07B6167D9Af',
     ];
 
     const tokenSymbols = {

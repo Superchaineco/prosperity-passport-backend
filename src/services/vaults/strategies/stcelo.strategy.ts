@@ -62,9 +62,9 @@ export class StCeloStrategy implements VaultStrategy {
     try {
       const provider = new JsonRpcProvider(JSON_RPC_PROVIDER);
 
-      // Minimal ERC-20 ABI
+      // Minimal ERC-20 ABI for stCELO
       const stCeloContract = new Contract(
-        '0xC668583dcbDc9ae6FA3CE46462758188adfdfC24', // stCELO token contract
+        '0xC668583dcbDc9ae6FA3CE46462758188adfdfC24',
         [
           {
             inputs: [
@@ -82,24 +82,11 @@ export class StCeloStrategy implements VaultStrategy {
             stateMutability: 'view',
             type: 'function',
           },
-          {
-            inputs: [],
-            name: 'symbol',
-            outputs: [{ internalType: 'string', name: '', type: 'string' }],
-            stateMutability: 'view',
-            type: 'function',
-          },
-          {
-            inputs: [],
-            name: 'name',
-            outputs: [{ internalType: 'string', name: '', type: 'string' }],
-            stateMutability: 'view',
-            type: 'function',
-          },
         ],
         provider
       );
 
+      // Contract to convert stCELO to CELO
       const stCeloManagerContract = new Contract(
         '0x0239b96D10a434a56CC9E09383077A0490cF9398',
         [
@@ -120,25 +107,25 @@ export class StCeloStrategy implements VaultStrategy {
         provider
       );
 
+      // Fetch stCELO balance
       const rawBalance = await stCeloContract.balanceOf(account);
       const decimals = await stCeloContract.decimals();
 
-      const celoBalance = await stCeloManagerContract.toCelo(rawBalance);
-      console.debug({
-        celoBalance,
-        rawBalance,
-      });
+      // Convert stCELO to CELO
+      const rawSupplyBalance = await stCeloManagerContract.toCelo(rawBalance);
 
-      // Format balance
-      const balance = formatUnits(celoBalance, decimals);
+      // Format balances
+      const balance = formatUnits(rawBalance, decimals);
+      const supplyBalance = formatUnits(rawSupplyBalance, decimals);
 
       console.log(
-        `Getting stCELO balance for account ${account}: ${balance} stCELO`
+        `Getting stCELO balance for account ${account}: ${balance} stCELO, equivalent to ${supplyBalance} CELO`
       );
 
       return {
         balance,
         raw_balance: rawBalance.toString(),
+        supply_balance: supplyBalance,
         decimals: Number(decimals),
         name: vault?.name || 'Staked CELO',
         metadata: {},
@@ -148,6 +135,7 @@ export class StCeloStrategy implements VaultStrategy {
       return {
         balance: '0',
         raw_balance: '0',
+        supply_balance: '0',
         decimals: vault?.decimals || 18,
         name: vault?.name || 'Staked CELO',
         metadata: {},

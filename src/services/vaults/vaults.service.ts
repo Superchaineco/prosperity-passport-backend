@@ -81,8 +81,9 @@ export class VaultsService {
     context?: Record<string, any>
   ) {
     const strategy = this.getStrategyForVault(vault);
-    if (!strategy)
-      return { balance: '0', raw_balance: '0', decimals: 18, name: vault.name, metadata: {} };
+    if (!strategy) {
+      throw new Error(`No strategy found for vault ${vault.reserve}`);
+    }
     const cache_key = `vault_balance_${vault.reserve}_${account}`;
     const fetchFunction = async () => {
       return strategy.getVaultBalance(vault, account, context);
@@ -111,6 +112,7 @@ export class VaultsService {
           ...vault,
           apr: aprData.apr,
           reserve: vault.reserve,
+          supply_balance: balanceData.supply_balance,
           asset: vault.asset || vault.reserve,
           balance: balanceData.balance,
           raw_balance: balanceData.raw_balance,

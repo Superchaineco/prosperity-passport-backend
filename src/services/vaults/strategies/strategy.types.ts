@@ -24,6 +24,7 @@ export interface APRData {
 export interface BalanceData {
   balance: string; // human-readable units
   raw_balance: string; // base units
+  supply_balance?: string; // equivalent balance in underlying asset (e.g., CELO for stCELO)
   decimals: number;
   name?: string;
   // Additional per-strategy info

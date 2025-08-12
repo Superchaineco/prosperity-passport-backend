@@ -444,6 +444,7 @@ export class AaveStrategy implements VaultStrategy {
       return {
         balance,
         raw_balance: rawBalance,
+        supply_balance: balance,
         decimals: vault.decimals,
         name: vault.name,
         metadata: { liquidityIndex },
@@ -457,6 +458,7 @@ export class AaveStrategy implements VaultStrategy {
       return {
         balance: '0',
         raw_balance: '0',
+        supply_balance: '0',
         decimals: vault.decimals,
         name: vault.name,
         metadata: { liquidityIndex },

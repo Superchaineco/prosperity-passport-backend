@@ -121,7 +121,7 @@ export class VaultsService {
           rewards_apr: 0,
           image: tokenImages[vault.symbol] || null,
           depreciated: false,
-          min_deposit: vault.symbol === 'WETH' ? 0.05 : 0.1,
+          min_deposit: vault.symbol === 'WETH' ? 0.05 : 100,
           _strategy: vault._strategy,
         } as Vault;
       })

@@ -11,7 +11,7 @@ import {
 export class StCeloStrategy implements VaultStrategy {
   async getVaultsData(): Promise<VaultBase[]> {
     // Mock data for stCELO (generic, no Aave-specific fields)
-    const mockStCeloVaults: VaultBase[] = [
+    const celoVaults: VaultBase[] = [
       {
         reserve: '0xC668583dcbDc9ae6FA3CE46462758188adfdfC24', // stCELO token address
         asset: '0x471EcE3750Da237f93B8E339c536989b8978a438', // underlying CELO address
@@ -23,11 +23,10 @@ export class StCeloStrategy implements VaultStrategy {
     ];
 
     try {
-      console.log('Getting stCELO vaults data (mocked)');
-      return mockStCeloVaults;
+      return celoVaults;
     } catch (error) {
       console.error('Error getting stCELO vaults data:', error);
-      return mockStCeloVaults;
+      return celoVaults;
     }
   }
 
@@ -40,11 +39,10 @@ export class StCeloStrategy implements VaultStrategy {
         };
       }
 
-      // Mock APR for stCELO
-      const mockAPR = '1.85'; // 8.5% APR
+      const apr = '1.85';
 
       return {
-        apr: mockAPR,
+        apr,
         symbol: vault.symbol || 'CELO',
       };
     } catch (error: any) {
@@ -69,7 +67,9 @@ export class StCeloStrategy implements VaultStrategy {
         '0xC668583dcbDc9ae6FA3CE46462758188adfdfC24', // stCELO token contract
         [
           {
-            inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+            inputs: [
+              { internalType: 'address', name: 'account', type: 'address' },
+            ],
             name: 'balanceOf',
             outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
             stateMutability: 'view',
@@ -100,15 +100,41 @@ export class StCeloStrategy implements VaultStrategy {
         provider
       );
 
-      // Fetch real user balance
+      const stCeloManagerContract = new Contract(
+        '0x0239b96D10a434a56CC9E09383077A0490cF9398',
+        [
+          {
+            inputs: [
+              {
+                internalType: 'uint256',
+                name: 'stCeloAmount',
+                type: 'uint256',
+              },
+            ],
+            name: 'toCelo',
+            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+            stateMutability: 'view',
+            type: 'function',
+          },
+        ],
+        provider
+      );
+
       const rawBalance = await stCeloContract.balanceOf(account);
-      console.debug(`Raw balance for account ${account}:`, rawBalance.toString());
       const decimals = await stCeloContract.decimals();
 
-      // Format balance
-      const balance = formatUnits(rawBalance, decimals);
+      const celoBalance = await stCeloManagerContract.toCelo(rawBalance);
+      console.debug({
+        celoBalance,
+        rawBalance,
+      });
 
-      console.log(`Getting stCELO balance for account ${account}: ${balance} stCELO`);
+      // Format balance
+      const balance = formatUnits(celoBalance, decimals);
+
+      console.log(
+        `Getting stCELO balance for account ${account}: ${balance} stCELO`
+      );
 
       return {
         balance,

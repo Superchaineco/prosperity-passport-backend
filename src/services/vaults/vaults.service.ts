@@ -34,8 +34,8 @@ export class VaultsService {
     this.redisService = redisService;
     // Register available strategies
     this.strategies = [
-      { name: 'aave', instance: new AaveStrategy() },
       { name: 'stcelo', instance: new StCeloStrategy() },
+      { name: 'aave', instance: new AaveStrategy() },
     ];
   }
 

@@ -38,9 +38,9 @@ export async function callPimlicoAPI({ jsonrpc, method, params, id }: any) {
 
   try {
     if (method === 'eth_sendUserOperation') {
-      const superChainAccount = await superChainAccountService.getAccountLevel(
-        params[0].sender
-      );
+      // const superChainAccount = await superChainAccountService.getAccountLevel(
+      //   params[0].sender
+      // );
       // const isAble = await isAbleToSponsor(params[0].sender, superChainAccount);
       // if (!isAble) {
       //   throw { message: "User is not able to sponsor" };

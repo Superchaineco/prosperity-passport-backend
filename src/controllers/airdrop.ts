@@ -52,15 +52,12 @@ export async function postAirdrop(req: Request, res: Response) {
 
 export async function getAirdrop(req: Request, res: Response) {
   const account = req.params.account as string;
-  const airdropId = req.query.airdropId as string;
 
   if (!account) {
     return res.status(500).json({ error: 'Invalid request' });
   }
 
-  if (!airdropId) {
-    return res.status(400).json({ error: 'airdropId is required' });
-  }
+
   try {
     const airdropService = new AirdropService();
 
@@ -82,12 +79,12 @@ export async function getAirdrop(req: Request, res: Response) {
              a.expiration_date AS expiration_date
       FROM airdrops a
       JOIN airdrop_recipients ar ON ar.airdrop_id = a.id
-      WHERE ar.address = $1 AND a.id = $2
+      WHERE ar.address = $1
       ORDER BY a.created_at DESC
       LIMIT 1
     `;
 
-    const { rows } = await client.query(q, [addrBuf, airdropId]);
+    const { rows } = await client.query(q, [addrBuf]);
     await client.end();
 
     if (!rows || rows.length === 0) {

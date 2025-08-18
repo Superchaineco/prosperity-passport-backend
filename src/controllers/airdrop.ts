@@ -11,7 +11,6 @@ export async function getAirdrop(req: Request, res: Response) {
   try {
     const airdropService = new AirdropService();
 
-    // Conectar a Postgres y leer las tablas airdrops / airdrop_recipients
     const client = new Client({ connectionString: process.env.DATABASE_URL });
     await client.connect();
 
@@ -26,7 +25,8 @@ export async function getAirdrop(req: Request, res: Response) {
              ar.reasons AS reasons,
              '0x' || encode(ar.address,'hex') AS address_hex,
              '0x' || encode(ar.leaf,'hex') AS leaf_hex,
-             '0x' || encode(a.root,'hex') AS root_hex
+             '0x' || encode(a.root,'hex') AS root_hex,
+             a.expiration_date AS expiration_date
       FROM airdrops a
       JOIN airdrop_recipients ar ON ar.airdrop_id = a.id
       WHERE ar.address = $1
@@ -76,6 +76,7 @@ export async function getAirdrop(req: Request, res: Response) {
           proofs,
           claimed: isClaimed,
           reasons,
+          expiration_date: row.expiration_date,
         }
       : {
           eligible: false,
@@ -84,6 +85,7 @@ export async function getAirdrop(req: Request, res: Response) {
           proofs: [],
           claimed: false,
           reasons: [],
+          expiration_date: row.expiration_date,
         };
 
     res.status(200).json(response);

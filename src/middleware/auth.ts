@@ -71,6 +71,7 @@ export async function verifyReverseProxy(req: Request, res: Response, next: Next
 function verifySession(req: Request) {
   const auth = req.headers.authorization;
   if (!auth?.startsWith("Bearer ")) {
+    console.log("Invalid Authorization header format: ", auth);
     throw new Error("Unauthorized - Invalid Authorization header format");
   }
 

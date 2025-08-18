@@ -1,15 +1,24 @@
 import { AirdropService } from '@/services/airdrop.service';
+import exp from 'constants';
 import { Request, Response } from 'express';
 import { Client } from 'pg';
 
 
 export async function postAirdrop(req: Request, res: Response) {
   const account: string = req.params.account as string;
+  const airdropId: string = req.body.airdropId as string;
   const txHash: string = req.body.hash as string;
+  console.log(req.body)
 
+  const addrHex = account.startsWith('0x') ? account.slice(2).toLowerCase() : account.toLowerCase();
+  const addrBuf = Buffer.from(addrHex, 'hex');
 
   if (!txHash) {
     return res.status(400).json({ error: "Transaction hash is required" });
+  }
+
+  if (!airdropId) {
+    return res.status(400).json({ error: "airdropId is required" });
   }
   const client = new Client({ connectionString: process.env.DATABASE_URL });
   try {
@@ -19,10 +28,10 @@ export async function postAirdrop(req: Request, res: Response) {
       `
       UPDATE airdrop_recipients
       SET hash = $1
-      WHERE address = $2
+      WHERE address = $2 AND airdrop_id = $3
       RETURNING *;
       `,
-      [txHash, account]
+      [txHash, addrBuf, airdropId]
     );
 
     if (result.rowCount === 0) {
@@ -31,7 +40,7 @@ export async function postAirdrop(req: Request, res: Response) {
 
     return res.status(200).json({
       message: "Airdrop recipient updated successfully",
-      recipient: result.rows[0],
+      recipient: result.rows[0].hash ,
     });
   } catch (error) {
     console.error("Error updating airdrop_recipients:", error);
@@ -43,9 +52,14 @@ export async function postAirdrop(req: Request, res: Response) {
 
 export async function getAirdrop(req: Request, res: Response) {
   const account = req.params.account as string;
+  const airdropId = req.query.airdropId as string;
 
   if (!account) {
     return res.status(500).json({ error: 'Invalid request' });
+  }
+
+  if (!airdropId) {
+    return res.status(400).json({ error: 'airdropId is required' });
   }
   try {
     const airdropService = new AirdropService();
@@ -68,12 +82,12 @@ export async function getAirdrop(req: Request, res: Response) {
              a.expiration_date AS expiration_date
       FROM airdrops a
       JOIN airdrop_recipients ar ON ar.airdrop_id = a.id
-      WHERE ar.address = $1
+      WHERE ar.address = $1 AND a.id = $2
       ORDER BY a.created_at DESC
       LIMIT 1
     `;
 
-    const { rows } = await client.query(q, [addrBuf]);
+    const { rows } = await client.query(q, [addrBuf, airdropId]);
     await client.end();
 
     if (!rows || rows.length === 0) {
@@ -85,6 +99,8 @@ export async function getAirdrop(req: Request, res: Response) {
         proofs: [],
         claimed: false,
         reasons: [],
+        airdrop_id: null,
+        expiration_date: new Date(),
       };
       return res.status(200).json(response);
     }
@@ -116,6 +132,7 @@ export async function getAirdrop(req: Request, res: Response) {
         claimed: isClaimed,
         reasons,
         expiration_date: row.expiration_date,
+        airdrop_id: row.airdrop_id,
       }
       : {
         eligible: false,
@@ -125,6 +142,7 @@ export async function getAirdrop(req: Request, res: Response) {
         claimed: false,
         reasons: [],
         expiration_date: row.expiration_date,
+        airdrop_id: null,
       };
 
     res.status(200).json(response);

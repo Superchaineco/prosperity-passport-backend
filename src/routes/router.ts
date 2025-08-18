@@ -15,7 +15,7 @@ import selfVerify, {
 } from '@/controllers/self';
 import { getVaults, refreshVaults } from '@/controllers/vaults';
 import { verifyFarcaster } from '@/controllers/farcaster';
-import { getAirdrop } from '@/controllers/airdrop';
+import { getAirdrop, postAirdrop } from '@/controllers/airdrop';
 import { rpcReverseProxy, verifyInternalRequest } from '@/controllers/rpcProxy';
 
 export const routes = Router();
@@ -31,6 +31,8 @@ routes.get('/perks/:level', perksByLevel);
 routes.get('/user/:account/sponsorship-balance', getBalance);
 
 routes.get('/airdrop/:account', getAirdrop);
+
+routes.post('/airdrop/:account', postAirdrop);
 
 routes.post('/user/:account/badges/claim', verifyOwner, claimBadges);
 

@@ -2,6 +2,45 @@ import { AirdropService } from '@/services/airdrop.service';
 import { Request, Response } from 'express';
 import { Client } from 'pg';
 
+
+export async function postAirdrop(req: Request, res: Response) {
+  const account: string = req.params.account as string;
+  const txHash: string = req.body.hash as string;
+
+
+  if (!txHash) {
+    return res.status(400).json({ error: "Transaction hash is required" });
+  }
+  const client = new Client({ connectionString: process.env.DATABASE_URL });
+  try {
+    await client.connect();
+
+    const result = await client.query(
+      `
+      UPDATE airdrop_recipients
+      SET hash = $1
+      WHERE address = $2
+      RETURNING *;
+      `,
+      [txHash, account]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Account not found" });
+    }
+
+    return res.status(200).json({
+      message: "Airdrop recipient updated successfully",
+      recipient: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Error updating airdrop_recipients:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  } finally {
+    await client.end();
+  }
+}
+
 export async function getAirdrop(req: Request, res: Response) {
   const account = req.params.account as string;
 
@@ -70,23 +109,23 @@ export async function getAirdrop(req: Request, res: Response) {
     const eligible = amount && amount !== '0';
     const response = eligible
       ? {
-          eligible: true,
-          address: row.address_hex,
-          value: amount,
-          proofs,
-          claimed: isClaimed,
-          reasons,
-          expiration_date: row.expiration_date,
-        }
+        eligible: true,
+        address: row.address_hex,
+        value: amount,
+        proofs,
+        claimed: isClaimed,
+        reasons,
+        expiration_date: row.expiration_date,
+      }
       : {
-          eligible: false,
-          address: '0x0000000000000000000000000000000000000000',
-          value: '0',
-          proofs: [],
-          claimed: false,
-          reasons: [],
-          expiration_date: row.expiration_date,
-        };
+        eligible: false,
+        address: '0x0000000000000000000000000000000000000000',
+        value: '0',
+        proofs: [],
+        claimed: false,
+        reasons: [],
+        expiration_date: row.expiration_date,
+      };
 
     res.status(200).json(response);
   } catch (error) {

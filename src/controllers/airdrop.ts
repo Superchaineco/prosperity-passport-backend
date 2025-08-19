@@ -8,32 +8,41 @@ export async function postAirdrop(req: Request, res: Response) {
   const account: string = req.params.account as string;
   const airdropId: string = req.body.airdropId as string;
   const txHash: string = req.body.hash as string;
-  console.log(req.body)
 
-  const addrHex = account.startsWith('0x') ? account.slice(2).toLowerCase() : account.toLowerCase();
-  const addrBuf = Buffer.from(addrHex, 'hex');
-
+  // Basic validations
   if (!txHash) {
     return res.status(400).json({ error: "Transaction hash is required" });
   }
-
   if (!airdropId) {
     return res.status(400).json({ error: "airdropId is required" });
   }
+  if (!account) {
+    return res.status(400).json({ error: "account is required" });
+  }
+
+  // Normalize and validate account as hex (EVM address)
+  const addrHex: string = (account.startsWith('0x') ? account.slice(2) : account).toLowerCase();
+  if (!/^[0-9a-f]{40}$/.test(addrHex)) {
+    return res.status(400).json({ error: "Invalid account (must be 20-byte hex address)" });
+  }
+  const addrBuf: Buffer = Buffer.from(addrHex, 'hex'); // bytea ready
+
   const client = new Client({ connectionString: process.env.DATABASE_URL });
   try {
     await client.connect();
 
-    const result = await client.query(
-      `
-  UPDATE airdrop_recipients
-  SET hash = $1
-  WHERE LOWER(address) = LOWER($2)
-    AND LOWER(airdrop_id) = LOWER($3)
-  RETURNING *;
-  `,
-      [txHash, addrBuf, airdropId]
-    );
+    const sql: string = `
+      UPDATE airdrop_recipients
+      SET hash = $1
+      WHERE address = $2
+        AND LOWER(airdrop_id::text) = LOWER($3::text)
+      RETURNING *;
+    `;
+
+    const params: [string, Buffer, string] = [txHash, addrBuf, airdropId];
+
+    const result = await client.query(sql, params);
+
 
     if (result.rowCount === 0) {
       return res.status(404).json({ error: "Account not found" });

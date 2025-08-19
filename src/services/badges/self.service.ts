@@ -27,7 +27,7 @@ export class SelfService {
       false,
       AllIds,
       configStore,
-      'hex'
+      'uuid'
     );
 
     const result = await selfBackendVerifier.verify(
@@ -75,10 +75,10 @@ export class SelfService {
     address: string
   ): Promise<SelfCheckResponse> {
     const selfData = await redisService.getCachedData(`self_id:${userId}`);
+    console.log('Checking self data for userId:', userId, selfData);
     if (!selfData) {
       return { message: 'Self data not found', check: false };
     }
-    console.log('Checking self data for userId:', userId, selfData);
     return {
       message: 'Validation success!',
       check: true,

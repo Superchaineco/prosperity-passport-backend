@@ -17,7 +17,7 @@ export default async function selfVerify(req: Request, res: Response) {
     const selfService = new SelfService();
     const userIdentifier = castToUserIdentifier(
       BigInt('0x' + userContextData.slice(64, 128)),
-      'hex'
+      'uuid'
     );
 
     try {

@@ -26,11 +26,12 @@ export async function postAirdrop(req: Request, res: Response) {
 
     const result = await client.query(
       `
-      UPDATE airdrop_recipients
-      SET hash = $1
-      WHERE address = $2 AND airdrop_id = $3
-      RETURNING *;
-      `,
+  UPDATE airdrop_recipients
+  SET hash = $1
+  WHERE LOWER(address) = LOWER($2)
+    AND LOWER(airdrop_id) = LOWER($3)
+  RETURNING *;
+  `,
       [txHash, addrBuf, airdropId]
     );
 
@@ -40,7 +41,7 @@ export async function postAirdrop(req: Request, res: Response) {
 
     return res.status(200).json({
       message: "Airdrop recipient updated successfully",
-      recipient: result.rows[0].hash ,
+      recipient: result.rows[0].hash,
     });
   } catch (error) {
     console.error("Error updating airdrop_recipients:", error);

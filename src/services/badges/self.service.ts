@@ -41,19 +41,8 @@ export class SelfService {
       console.log('Verification successful:', result.isValidDetails);
 
       const filteredSubject = { ...result.discloseOutput };
-      const cache_key = `self_id:${userIdentifier}`;
+      const cache_key = `self_id_pre:${userIdentifier}`;
       redisService.setCachedData(cache_key, filteredSubject, 0);
-
-      //     const cache_key = `self_id_pre:${userId}`;
-      //     redisService.setCachedData(
-      //         cache_key,
-      //         result.credentialSubject, 0
-      //     );
-
-      //     return {
-      //         isValid: true,
-      //         credentialSubject: result.credentialSubject,
-      //     }
 
       return {
         isValid: true,

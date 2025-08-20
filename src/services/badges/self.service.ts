@@ -63,29 +63,29 @@ export class SelfService {
     userId: string,
     address: string
   ): Promise<SelfCheckResponse> {
-    const selfData = await redisService.getCachedData(`self_id:${userId}`);
-    console.log('Checking self data for userId:', userId, selfData);
-    if (!selfData) {
-      return { message: 'Self data not found', check: false };
-    }
-    return {
-      message: 'Validation success!',
-      check: true,
-      data: selfData,
-    };
-
-    // const cache_pre_key = `self_id_pre:${userId}`;
-    // const cache_key = `self_id:${address}`;
-    // const selfData =
-    //   (await redisService.getCachedData(cache_pre_key)) ??
-    //   (await redisService.getCachedData(cache_key));
-
+    // const selfData = await redisService.getCachedData(`self_id:${userId}`);
     // console.log('Checking self data for userId:', userId, selfData);
-    // console.log(selfData != null);
-    // if (selfData != null && Object.keys(selfData).length > 0) {
-    //   return { message: 'Validation success!', check: true, data: selfData };
+    // if (!selfData) {
+    //   return { message: 'Self data not found', check: false };
     // }
-    // return { message: 'Self data not found', check: false };
+    // return {
+    //   message: 'Validation success!',
+    //   check: true,
+    //   data: selfData,
+    // };
+
+    const cache_pre_key = `self_id_pre:${userId}`;
+    const cache_key = `self_id:${address}`;
+    const selfData =
+      (await redisService.getCachedData(cache_pre_key)) ??
+      (await redisService.getCachedData(cache_key));
+
+    console.log('Checking self data for userId:', userId, selfData);
+    console.log(selfData != null);
+    if (selfData != null && Object.keys(selfData).length > 0) {
+      return { message: 'Validation success!', check: true, data: selfData };
+    }
+    return { message: 'Self data not found', check: false };
   }
 }
 

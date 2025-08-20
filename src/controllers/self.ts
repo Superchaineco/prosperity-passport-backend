@@ -8,6 +8,8 @@ export default async function selfVerify(req: Request, res: Response) {
   if (req.method === 'POST') {
     const { attestationId, proof, publicSignals, userContextData } = req.body;
 
+
+     console.log('Verification recieved info:', req.body);
     if (!proof || !publicSignals) {
       return res
         .status(400)

@@ -9,6 +9,7 @@ import {
 } from '../strategy.types';
 import { UIPoolDataProviderABI } from './abis';
 import { getAssetPrice } from '@/services/assetPricing.service';
+import axios from 'axios';
 
 const RAY_DECIMALS = 27;
 function formatAPR(rayValue: bigint) {
@@ -17,6 +18,11 @@ function formatAPR(rayValue: bigint) {
 
 const symbolMapping = {
   'USD₮': 'USDT',
+};
+
+const meritProgramMapping = {
+  '0x48065fbBE25f71C9282ddf5e1cD6D6A887483D5e': 'celo-supply-usdt',
+  '0xD221812de1BD094f35587EE8E174B07B6167D9Af': 'celo-supply-weth',
 };
 
 export class AaveStrategy implements VaultStrategy {
@@ -56,7 +62,6 @@ export class AaveStrategy implements VaultStrategy {
         );
 
         const symbol = symbolMapping[reserveData[2]] || reserveData[2];
-
         return {
           reserve: address,
           asset: address,
@@ -99,8 +104,22 @@ export class AaveStrategy implements VaultStrategy {
         };
       }
 
+      const response = await axios.get(
+        'https://apps.aavechan.com/api/merit/aprs'
+      );
+      const meritProgramAprs = response.data.currentAPR.actionsAPR;
+
+      console.debug(
+        vault.metadata.apr,
+        meritProgramAprs[meritProgramMapping[vault.asset]]
+      );
+      const calculatedApr =
+        Number(vault.metadata?.apr ?? '0') +
+        (meritProgramAprs[meritProgramMapping[vault.asset]] || 0);
+      meritProgramAprs[meritProgramMapping[vault.asset]] || 0;
+
       return {
-        apr: vault.metadata?.apr ?? '0',
+        apr: calculatedApr,
         symbol: vault.symbol,
         metadata: { liquidityIndex: vault.metadata?.liquidityIndex ?? '0' },
       };
@@ -165,7 +184,7 @@ export class AaveStrategy implements VaultStrategy {
       );
 
       const assetPrice = await getAssetPrice(vault.asset);
-      console.debug("Asset price for vault:", vault.asset, assetPrice);
+      console.debug('Asset price for vault:', vault.asset, assetPrice);
 
       return {
         balance,

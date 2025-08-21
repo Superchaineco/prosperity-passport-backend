@@ -1,6 +1,6 @@
 import { RedisService } from '../redis.service';
-import { AaveStrategy } from './strategies/aave.strategy';
-import { StCeloStrategy } from './strategies/stcelo.strategy';
+import { AaveStrategy } from './strategies/aave/aave.strategy';
+import { StCeloStrategy } from './strategies/stcelo/stcelo.strategy';
 import { VaultStrategy } from './strategies/strategy.types';
 
 type Vault = {
@@ -125,6 +125,7 @@ export class VaultsService {
           depreciated: false,
           min_deposit: vault.symbol === 'WETH' ? 0.05 : 100,
           _strategy: vault._strategy,
+          asset_price: balanceData.asset_price || 0,
         } as Vault;
       })
     );

@@ -13,6 +13,5 @@ export async function refreshVaults(req: Request, res: Response) {
   const account = req.params.account as string;
   const vaultsService = new VaultsService(redisService);
   await vaultsService.refreshVaultsCache(account);
-  console.log('returning...');
   return res.status(200).json({ message: 'Vaults refreshed' });
 }

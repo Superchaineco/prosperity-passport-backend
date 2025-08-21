@@ -15,7 +15,7 @@ export interface VaultBase {
 }
 
 export interface APRData {
-  apr: string; // percentage value as string, e.g., "8.5"
+  apr: string; // percentage value as string, e.g., "0.85"
   symbol: string;
   // Additional per-strategy info (e.g., Aave liquidityIndex)
   metadata?: Record<string, any>;
@@ -25,6 +25,7 @@ export interface BalanceData {
   balance: string; // human-readable units
   raw_balance: string; // base units
   supply_balance?: string; // equivalent balance in underlying asset (e.g., CELO for stCELO)
+  asset_price: number; // price of the underlying asset in USD
   decimals: number;
   name?: string;
   // Additional per-strategy info

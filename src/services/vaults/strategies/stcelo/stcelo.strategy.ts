@@ -1,12 +1,14 @@
 import { JsonRpcProvider, Contract, formatUnits } from 'ethers';
-import { JSON_RPC_PROVIDER } from '../../../config/superChain/constants';
+import { JSON_RPC_PROVIDER } from '../../../../config/superChain/constants';
 import {
   VaultStrategy,
   VaultBase,
   APRData,
   BalanceData,
   StrategyContext,
-} from './strategy.types';
+} from '../strategy.types';
+import { stCeloContractABI, stCeloManagerContractABI } from './abis';
+import { getAssetPrice } from '@/services/assetPricing.service';
 
 export class StCeloStrategy implements VaultStrategy {
   async getVaultsData(): Promise<VaultBase[]> {
@@ -65,45 +67,14 @@ export class StCeloStrategy implements VaultStrategy {
       // Minimal ERC-20 ABI for stCELO
       const stCeloContract = new Contract(
         '0xC668583dcbDc9ae6FA3CE46462758188adfdfC24',
-        [
-          {
-            inputs: [
-              { internalType: 'address', name: 'account', type: 'address' },
-            ],
-            name: 'balanceOf',
-            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-            stateMutability: 'view',
-            type: 'function',
-          },
-          {
-            inputs: [],
-            name: 'decimals',
-            outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
-            stateMutability: 'view',
-            type: 'function',
-          },
-        ],
+        stCeloContractABI,
         provider
       );
 
       // Contract to convert stCELO to CELO
       const stCeloManagerContract = new Contract(
         '0x0239b96D10a434a56CC9E09383077A0490cF9398',
-        [
-          {
-            inputs: [
-              {
-                internalType: 'uint256',
-                name: 'stCeloAmount',
-                type: 'uint256',
-              },
-            ],
-            name: 'toCelo',
-            outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-            stateMutability: 'view',
-            type: 'function',
-          },
-        ],
+        stCeloManagerContractABI,
         provider
       );
 
@@ -121,12 +92,14 @@ export class StCeloStrategy implements VaultStrategy {
       console.log(
         `Getting stCELO balance for account ${account}: ${balance} stCELO, equivalent to ${supplyBalance} CELO`
       );
+      const assetPrice = await getAssetPrice(vault.asset);
 
       return {
         balance,
         raw_balance: rawBalance.toString(),
         supply_balance: supplyBalance,
         decimals: Number(decimals),
+        asset_price: assetPrice,
         name: vault?.name || 'Staked CELO',
         metadata: {},
       };
@@ -136,6 +109,7 @@ export class StCeloStrategy implements VaultStrategy {
         balance: '0',
         raw_balance: '0',
         supply_balance: '0',
+        asset_price: 0,
         decimals: vault?.decimals || 18,
         name: vault?.name || 'Staked CELO',
         metadata: {},

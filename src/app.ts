@@ -1,18 +1,15 @@
 import express from 'express';
-import Session from 'express-session';
 import cors from 'cors';
 import morgan from 'morgan';
-import { RedisStore } from 'connect-redis';
 import * as middleware from './utils/middleware';
 import router from './routes/router';
 import authRouter from './routes/auth';
 import {
   DOMAIN,
-  ENV,
-  ENVIRONMENTS,
-  SESSION_SECRET,
+  ENV
 } from './config/superChain/constants';
-import { redis } from './utils/cache';
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger";
 
 const app = express();
 console.debug('ENV', ENV);
@@ -57,6 +54,11 @@ app.use((req, res, next) => {
 //     rolling: true,
 //   })
 // );
+
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get("/docs.json", (_req, res) => res.json(swaggerSpec));
+
 
 app.set('trust proxy', 1);
 app.use(morgan('tiny'));

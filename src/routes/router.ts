@@ -17,6 +17,8 @@ import { getVaults, refreshVaults } from '@/controllers/vaults';
 import { verifyFarcaster } from '@/controllers/farcaster';
 import { getAirdrop, postAirdrop } from '@/controllers/airdrop';
 import { rpcReverseProxy, verifyInternalRequest } from '@/controllers/rpcProxy';
+import { getAccount, getAccountByUsername, postAccountsByEOAs } from '@/controllers/account';
+
 
 export const routes = Router();
 
@@ -55,5 +57,11 @@ routes.post('/user-op-reverse-proxy', verifyReverseProxy, reverseProxy);
 routes.post('/farcaster/verify/:account', verifyOwner, verifyFarcaster);
 
 routes.use('/rpc', verifyInternalRequest, rpcReverseProxy);
+
+routes.use('/account/by-address/:address', getAccount);
+
+routes.use('/account/by-username/:username', getAccountByUsername);
+
+routes.post("/accounts/by-eoas", postAccountsByEOAs);
 
 export default routes;

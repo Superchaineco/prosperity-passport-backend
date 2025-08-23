@@ -13,7 +13,7 @@ import {
 } from '../config/superChain/constants';
 import { superChainAccountService } from './superChainAccount.service';
 import { redisService } from './redis.service';
-import { ResponseBadge } from './badges/badges.service';
+import { BadgesServices, ResponseBadge } from './badges/badges.service';
 import Safe, { encodeMultiSendData, OnchainAnalyticsProps } from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
 import Safe4337Pack from '@safe-global/relay-kit/dist/src/packs/safe-4337/Safe4337Pack';
@@ -334,7 +334,7 @@ export class AttestationsService {
       const update = badgeUpdates.find((u) => u.badgeId === badge.badgeId);
       if (update) {
         badge.tier = update.level;
-        badge.points = update.points;
+        badge.points += update.points;
         badge.claimable = false;
       }
       return badge;
@@ -348,7 +348,8 @@ export class AttestationsService {
     );
     const level = await superChainAccountService.getAccountLevel(account);
     const total_badges = updatedBadges.reduce((acc, badge) => acc + badge.tier, 0)
-    const total_points = updatedBadges.reduce((acc, badge) => acc + badge.points, 0)
+    const badgesService = new BadgesServices();
+    const total_points = badgesService.getTotalPoints(updatedBadges);
     updateAccount(account, level, total_points, total_badges);
     console.log('Optimistic updated badges for:', account);
   }

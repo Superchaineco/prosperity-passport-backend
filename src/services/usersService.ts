@@ -16,7 +16,7 @@ export async function getUser(account: string): Promise<User | null> {
     `
         const result = await client.query(query, [account.toUpperCase()])
 
-        if (result.rows.length === 0) return null
+        if (result.rows.length === 0 || result.rows[0].nationality == '' || result.rows[0].nationality == null) return null
         return result.rows[0] as User
     } catch (err) {
         console.error('Error getting user:', err)

@@ -322,7 +322,7 @@ export class AttestationsService {
     badgeUpdates: { badgeId: number; level: number; points: number }[]
   ): Promise<void> {
     const CACHE_KEY = `cached_badges:${account}`;
-   
+
 
     const existingData = await redisService.getCachedData(CACHE_KEY);
     if (!existingData) {
@@ -346,7 +346,7 @@ export class AttestationsService {
       updatedBadges,
       null
     );
-    const level = await superChainAccountService.getAccountLevel(account);    
+    const level = await superChainAccountService.getAccountLevel(account);
     const total_badges = updatedBadges.reduce((acc, badge) => acc + badge.tier, 0)
     const total_points = updatedBadges.reduce((acc, badge) => acc + badge.points, 0)
     updateAccount(account, level, total_points, total_badges);
@@ -355,7 +355,7 @@ export class AttestationsService {
 }
 
 
-async function updateAccount(account: string, level:number, total_points: number, total_badges: number) {
+async function updateAccount(account: string, level: number, total_points: number, total_badges: number) {
   try {
     updateAccountStats(account, { level, total_points, total_badges })
   } catch (error) {

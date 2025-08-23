@@ -7,6 +7,7 @@ import {
   VerificationConfig,
 } from '@selfxyz/core';
 import { redisService } from '../redis.service';
+import { getAccountByAddress } from '../account.service';
 
 export class SelfService {
   public async selfVerify(
@@ -63,13 +64,12 @@ export class SelfService {
     userId: string,
     address: string
   ): Promise<SelfCheckResponse> {
-  
+
 
     const cache_pre_key = `self_id_pre:${userId}`;
-    const cache_key = `self_id:${address}`;
+    const accountData = await getAccountByAddress(address)
     const selfData =
-      (await redisService.getCachedData(cache_pre_key)) ??
-      (await redisService.getCachedData(cache_key));
+      (await redisService.getCachedData(cache_pre_key)) ?? accountData?.nationality;
 
     console.log('Checking self data for userId:', userId, selfData);
     console.log(selfData != null);

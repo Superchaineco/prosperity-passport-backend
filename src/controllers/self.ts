@@ -3,13 +3,14 @@ import { redisService } from '@/services/redis.service';
 import { SelfService } from '@/services/badges/self.service';
 import { castToUserIdentifier } from '@selfxyz/common/utils/circuits/uuid';
 import { Console } from 'console';
+import { pool } from '@/config/superChain/constants';
 
 export default async function selfVerify(req: Request, res: Response) {
   if (req.method === 'POST') {
     const { attestationId, proof, publicSignals, userContextData } = req.body;
 
 
-     console.log('Verification recieved info:', req.body);
+    console.log('Verification recieved info:', req.body);
     if (!proof || !publicSignals) {
       return res
         .status(400)
@@ -101,18 +102,31 @@ export async function getNationalitiesBatch(req: Request, res: Response) {
     }
 
     console.log('Processed addresses:', processedAddresses);
-    const redisKeys = processedAddresses.map((address) => `self_id:${address}`);
+    const lowerAddresses = processedAddresses.map((a) => a.toLowerCase());
 
-    const redisResults = await Promise.all(
-      redisKeys.map((key) => redisService.getCachedData(key))
+    type Row = { account: string; nationality: string | null };
+
+    const { rows } = await pool.query<Row>(
+      `
+  SELECT account, nationality
+  FROM public.users
+  WHERE lower(account) = ANY($1::text[])
+  `,
+      [lowerAddresses]
+    );
+
+    // Mapeamos por lower(account) para lookup rápido
+    const byAccount = new Map<string, string | null>(
+      rows.map((r) => [r.account.toLowerCase(), r.nationality])
     );
 
     const responseData: NationalityResponse = {};
 
-    processedAddresses.forEach((address, index) => {
-      const redisData = redisResults[index];
-      if (redisData && redisData.nationality) {
-        responseData[address] = redisData.nationality;
+    processedAddresses.forEach((address) => {
+      const nat = byAccount.get(address.toLowerCase());
+      if (nat) {
+        // conservamos la clave con el address procesado (mayúsculas en tu flujo actual)
+        responseData[address] = nat;
       }
     });
 

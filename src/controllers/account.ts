@@ -43,9 +43,11 @@ export function requireApiKey(
  *       in: header
  *       name: x-api-key
  *   schemas:
-*     AccountRecord:
+ *     AccountRecord:
  *       type: object
- *       required: [account, eoas]
+ *       required:
+ *         - account
+ *         - eoas
  *       properties:
  *         account:
  *           type: string
@@ -64,39 +66,29 @@ export function requireApiKey(
  *             pattern: '^0x[0-9a-fA-F]{40}$'
  *         level:
  *           type: integer
- *           description: User level.
  *           nullable: true
+ *           description: User level.
  *         noun:
  *           type: object
  *           nullable: true
  *           additionalProperties: true
- *           description: Free-form JSON stored as jsonb (e.g. {"background":0,"body":27,"accessory":141,"head":216,"glasses":6}).
+ *           description: Free-form JSON stored as jsonb.
  *         total_points:
  *           type: integer
- *           description: Cumulative points.
  *           nullable: true
+ *           description: Cumulative points.
  *         total_badges:
  *           type: integer
- *           description: Total badges earned.
  *           nullable: true
- *       example:
- *         account: "0xc250d56576fcf1584077ace94b3d06c3af4f32c3"
- *         nationality: null
- *         username: "0xj4an.prosperity"
- *         eoas:
- *           - "0x9ae4f0f0fff687ebf7b3d2277f0064103a7dc46b"
- *         level: 5
- *         noun:
- *           background: 0
- *           body: 27
- *           accessory: 141
- *           head: 216
- *           glasses: 6
- *         total_points: 1515
- *         total_badges: 45
+ *           description: Total badges earned.
  *     AccountsPage:
  *       type: object
- *       required: [data, page, pageSize, total, totalPages]
+ *       required:
+ *         - data
+ *         - page
+ *         - pageSize
+ *         - total
+ *         - totalPages
  *       properties:
  *         data:
  *           type: array
@@ -117,19 +109,23 @@ export function requireApiKey(
  *           minimum: 1
  *     Error:
  *       type: object
- *       required: [error]
+ *       required:
+ *         - error
  *       properties:
  *         error:
  *           type: string
  */
+
+
 /**
  * @openapi
  * /account/by-address/{address}:
  *   get:
- *      security:
- *       - ApiKeyAuth: []
- *     tags: [accounts]
+ *     tags:
+ *       - accounts
  *     summary: Retrieve an account by address (case-insensitive).
+ *     security:
+ *       - ApiKeyAuth: []
  *     parameters:
  *       - in: path
  *         name: address
@@ -148,12 +144,14 @@ export function requireApiKey(
  *         description: Missing or invalid parameters.
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       '404':
  *         description: Not found.
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       '500':
  *         description: Server error.
  */
@@ -176,10 +174,11 @@ export async function getAccount(
  * @openapi
  * /account/by-username/{username}:
  *   get:
- *      security:
- *       - ApiKeyAuth: []
- *     tags: [accounts]
+ *     tags:
+ *       - accounts
  *     summary: Retrieve an account by username (case-insensitive).
+ *     security:
+ *       - ApiKeyAuth: []
  *     parameters:
  *       - in: path
  *         name: username
@@ -197,15 +196,18 @@ export async function getAccount(
  *         description: Missing or invalid parameters.
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       '404':
  *         description: Not found.
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       '500':
  *         description: Server error.
  */
+
 
 // GET /accounts/by-username/:username
 export async function getAccountByUsername(
@@ -226,17 +228,19 @@ export async function getAccountByUsername(
  * @openapi
  * /accounts/by-eoas:
  *   post:
- *       security:
- *       - ApiKeyAuth: []
- *     tags: [accounts]
+ *     tags:
+ *       - accounts
  *     summary: List accounts that contain at least one of the given EOAs (paginated by 100).
+ *     security:
+ *       - ApiKeyAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required: [eoas]
+ *             required:
+ *               - eoas
  *             properties:
  *               eoas:
  *                 type: array
@@ -249,13 +253,6 @@ export async function getAccountByUsername(
  *                 type: integer
  *                 minimum: 1
  *                 default: 1
- *           examples:
- *             sample:
- *               value:
- *                 eoas:
- *                   - '0x9ae4F0f0FFF687eBf7B3d2277F0064103A7DC46b'
- *                   - '0x66f9a27957Af42465d3A3f1FC2AE5d446Bc75775'
- *                 page: 1
  *     responses:
  *       '200':
  *         description: Paginated result.
@@ -267,15 +264,18 @@ export async function getAccountByUsername(
  *         description: Bad request.
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       '413':
  *         description: Payload too large.
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       '500':
  *         description: Server error.
  */
+
 
 export async function postAccountsByEOAs(
     req: Request<unknown, unknown, { eoas?: unknown; page?: unknown }>,

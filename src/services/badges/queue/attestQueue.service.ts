@@ -1,11 +1,9 @@
 // Este nuevo enfoque elimina el Worker de BullMQ y procesa los jobs manualmente cada 10 segundos
-import { Job, Queue, QueueEvents } from 'bullmq';
+import { Queue } from 'bullmq';
 import { redisWorker } from '@/utils/cache';
 import { ENV, ENVIRONMENTS } from '@/config/superChain/constants';
 import { AttestationsService } from '@/services/attestations.service';
 import { ResponseBadge } from '../badges.service';
-import { updateAccountStats } from '@/services/account.service';
-import { superChainAccountService } from '@/services/superChainAccount.service';
 
 interface AttestJobData {
     account: string;
@@ -117,7 +115,7 @@ export class AttestQueueService {
             if (result) {
                 console.log('🧑‍⚖️ Result found:', result);
                 this.resultMap.delete(data.account.toLowerCase());
-                await updateAccount(data.account)
+
                 return result;
             }
             await new Promise((resolve) => setTimeout(resolve, 500));
@@ -127,20 +125,6 @@ export class AttestQueueService {
 }
 
 
-
-async function updateAccount(account: string) {
-    try {
-        const level = await superChainAccountService.getAccountLevel(account);
-
-        const badges = await superChainAccountService.getSuperChainSmartAccountBadges(account);
-        const total_badges = badges.reduce((acc, badge) => acc + badge.tier, 0)
-        const total_points = badges.reduce((acc, badge) => acc + badge.points, 0)
-        updateAccountStats(account, { level, total_points, total_badges })
-    } catch (error) {
-        console.error('Error updating account stats:', error);
-    }
-
-}
 
 
 

@@ -23,7 +23,7 @@ export class BadgesServices {
 
   public async getCachedBadges(account: string, extraData?: any | undefined): Promise<any[]> {
     const CACHE_KEY = `cached_badges:${account}`;
-    const OPTIMISTIC_KEY = `optimistic_updated_cached_badges:${account}`;
+
 
     const fetchFresh = async (): Promise<any[]> => {
       const eoas = await superChainAccountService.getEOAS(account);
@@ -31,35 +31,17 @@ export class BadgesServices {
       await redisService.setCachedData(CACHE_KEY, freshData, null);
       return freshData;
     };
-
-    const optimisticData = await redisService.getCachedData(OPTIMISTIC_KEY);
     const cachedData = await redisService.getCachedData(CACHE_KEY);
 
-    if (optimisticData && cachedData) {
-      void fetchFresh().then(fresh => {
-        if (JSON.stringify(fresh) !== JSON.stringify(cachedData)) {
-          redisService.setCachedData(CACHE_KEY, fresh, null);
-          redisService.deleteCachedData(OPTIMISTIC_KEY);
-        }
-      }).catch(err => console.error('Error fetching fresh data:', err));
-      return optimisticData;
+    if (!cachedData) {
+      return await fetchFresh();
     }
+    return cachedData;
 
-    if (cachedData) {
-      const fresh = await fetchFresh();
-      if (JSON.stringify(fresh) !== JSON.stringify(cachedData)) {
-        return fresh;
-      }
-      return cachedData;
-    }
-
-    return await fetchFresh();
   }
 
 
   public async fetchBadges(account: string) {
-    const CACHE_KEY = `user_badges:${account}`;
-    const ttl = 3600;
 
     const fetchFunction = async () => {
       const { data, errors }: ExecutionResult<GetUserBadgesQuery> =

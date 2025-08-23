@@ -19,6 +19,7 @@ import SafeApiKit from '@safe-global/api-kit';
 import Safe4337Pack from '@safe-global/relay-kit/dist/src/packs/safe-4337/Safe4337Pack';
 import { MetaTransactionData, OperationType } from '@safe-global/types-kit';
 import config from '@/config';
+import { updateAccountStats } from './account.service';
 
 export class AttestationsService {
   private easContractAddress = EAS_CONTRACT_ADDRESS;
@@ -321,7 +322,7 @@ export class AttestationsService {
     badgeUpdates: { badgeId: number; level: number; points: number }[]
   ): Promise<void> {
     const CACHE_KEY = `cached_badges:${account}`;
-    // const OPTIMISTIC_UPDATED_CACHE_KEY = `optimistic_updated_cached_badges:${account}`;
+   
 
     const existingData = await redisService.getCachedData(CACHE_KEY);
     if (!existingData) {
@@ -332,7 +333,7 @@ export class AttestationsService {
     const updatedBadges = existingData.map((badge: any) => {
       const update = badgeUpdates.find((u) => u.badgeId === badge.badgeId);
       if (update) {
-        badge.level = update.level;
+        badge.tier = update.level;
         badge.points = update.points;
         badge.claimable = false;
       }
@@ -345,6 +346,21 @@ export class AttestationsService {
       updatedBadges,
       null
     );
+    const level = await superChainAccountService.getAccountLevel(account);    
+    const total_badges = updatedBadges.reduce((acc, badge) => acc + badge.tier, 0)
+    const total_points = updatedBadges.reduce((acc, badge) => acc + badge.points, 0)
+    updateAccount(account, level, total_points, total_badges);
     console.log('Optimistic updated badges for:', account);
   }
 }
+
+
+async function updateAccount(account: string, level:number, total_points: number, total_badges: number) {
+  try {
+    updateAccountStats(account, { level, total_points, total_badges })
+  } catch (error) {
+    console.error('Error updating account stats:', error);
+  }
+
+}
+

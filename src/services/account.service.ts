@@ -5,7 +5,11 @@ export interface AccountRecord {
   account: string;
   nationality: string | null;
   username: string | null;
-  eoas: string[]; 
+  eoas: string[];
+  level: number;
+  noun: any;
+  total_points: number;
+  total_badges: number;
 }
 
 
@@ -14,7 +18,7 @@ export async function getAccountByAddress(account: string): Promise<AccountRecor
   const client = await pool.connect();
   try {
     const sql = `
-      SELECT account, nationality, username, eoas
+      SELECT account, nationality, username, eoas,level,noun,total_points,total_badges
       FROM users
       WHERE LOWER(account) = LOWER($1)
       LIMIT 1
@@ -32,7 +36,7 @@ export async function getAccountByUsername(username: string): Promise<AccountRec
   const client = await pool.connect();
   try {
     const sql = `
-      SELECT account, nationality, username, eoas
+      SELECT account, nationality, username, eoas,level,noun,total_points,total_badges
       FROM users
       WHERE LOWER(username) = LOWER($1)
       LIMIT 1
@@ -67,9 +71,9 @@ export async function listAccountsByEOAs(eoas: string[], page: number): Promise<
   const client = await pool.connect();
   try {
     const sql: string = `
-      SELECT account, nationality, username, eoas
+      SELECT account, nationality, username, eoas,level,noun,total_points,total_badges
       FROM users
-      WHERE eoas && $1::text[]      -- overlap exacto (aprovecha el GIN)
+      WHERE eoas && $1::text[]      
       ORDER BY account ASC
       OFFSET $2
       LIMIT $3

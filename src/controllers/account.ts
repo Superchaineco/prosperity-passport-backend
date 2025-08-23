@@ -17,7 +17,7 @@ import type { Request, Response } from "express";
  *       in: header
  *       name: x-api-key
  *   schemas:
- *     AccountRecord:
+*     AccountRecord:
  *       type: object
  *       required: [account, eoas]
  *       properties:
@@ -36,6 +36,38 @@ import type { Request, Response } from "express";
  *           items:
  *             type: string
  *             pattern: '^0x[0-9a-fA-F]{40}$'
+ *         level:
+ *           type: integer
+ *           description: User level.
+ *           nullable: true
+ *         noun:
+ *           type: object
+ *           nullable: true
+ *           additionalProperties: true
+ *           description: Free-form JSON stored as jsonb (e.g. {"background":0,"body":27,"accessory":141,"head":216,"glasses":6}).
+ *         total_points:
+ *           type: integer
+ *           description: Cumulative points.
+ *           nullable: true
+ *         total_badges:
+ *           type: integer
+ *           description: Total badges earned.
+ *           nullable: true
+ *       example:
+ *         account: "0xc250d56576fcf1584077ace94b3d06c3af4f32c3"
+ *         nationality: null
+ *         username: "0xj4an.prosperity"
+ *         eoas:
+ *           - "0x9ae4f0f0fff687ebf7b3d2277f0064103a7dc46b"
+ *         level: 5
+ *         noun:
+ *           background: 0
+ *           body: 27
+ *           accessory: 141
+ *           head: 216
+ *           glasses: 6
+ *         total_points: 1515
+ *         total_badges: 45
  *     AccountsPage:
  *       type: object
  *       required: [data, page, pageSize, total, totalPages]
@@ -214,35 +246,35 @@ export async function getAccountByUsername(
  */
 
 export async function postAccountsByEOAs(
-  req: Request<unknown, unknown, { eoas?: unknown; page?: unknown }>,
-  res: Response<
-    | { data: AccountRecord[]; page: number; pageSize: number; total: number; totalPages: number }
-    | { error: string }
-  >
+    req: Request<unknown, unknown, { eoas?: unknown; page?: unknown }>,
+    res: Response<
+        | { data: AccountRecord[]; page: number; pageSize: number; total: number; totalPages: number }
+        | { error: string }
+    >
 ): Promise<void> {
-  const body = req.body ?? {};
-  if (!Array.isArray(body.eoas) || body.eoas.length === 0) {
-    res.status(400).json({ error: "body.eoas (string[]) is required" });
-    return;
-  }
+    const body = req.body ?? {};
+    if (!Array.isArray(body.eoas) || body.eoas.length === 0) {
+        res.status(400).json({ error: "body.eoas (string[]) is required" });
+        return;
+    }
 
-  const eoas: string[] = body.eoas
-    .filter((x: unknown): x is string => typeof x === "string")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0);
+    const eoas: string[] = body.eoas
+        .filter((x: unknown): x is string => typeof x === "string")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
 
-  const rawPage = body.page;
-  const pageParsed =
-    typeof rawPage === "number" ? rawPage : typeof rawPage === "string" ? Number.parseInt(rawPage, 10) : 1;
-  const page = Number.isFinite(pageParsed) && pageParsed > 0 ? Math.floor(pageParsed) : 1;
+    const rawPage = body.page;
+    const pageParsed =
+        typeof rawPage === "number" ? rawPage : typeof rawPage === "string" ? Number.parseInt(rawPage, 10) : 1;
+    const page = Number.isFinite(pageParsed) && pageParsed > 0 ? Math.floor(pageParsed) : 1;
 
-  const [data, total] = await Promise.all([
-    listAccountsByEOAs(eoas, page),
-    countAccountsByEOAs(eoas),
-  ]);
+    const [data, total] = await Promise.all([
+        listAccountsByEOAs(eoas, page),
+        countAccountsByEOAs(eoas),
+    ]);
 
-  const pageSize = 100;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const pageSize = 100;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  res.status(200).json({ data, page, pageSize, total, totalPages });
+    res.status(200).json({ data, page, pageSize, total, totalPages });
 }

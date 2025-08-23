@@ -1,6 +1,5 @@
 import { redis, redisClient } from '../utils/cache';
 import { createFarcaster, getFarcaster } from './farcasterService';
-import { createUser, getUser } from './usersService';
 
 export class RedisService {
   public async getCachedDataWithCallback<T>(
@@ -33,12 +32,7 @@ export class RedisService {
     if (ttl) await redis.set(key, JSON.stringify(data), 'EX', ttl);
     else {
       try {
-        if (key.startsWith('self_id:')) {
-          await createUser({
-            account: key.replace('self_id:', ''),
-            nationality: data.nationality,
-          });
-        } else if (key.startsWith('farcasterLink')) {
+        if (key.startsWith('farcasterLink')) {
           await createFarcaster({
             account: key.replace('farcasterLink-', ''),
             fid: data.fid,
@@ -55,9 +49,7 @@ export class RedisService {
 
   public async getCachedData(key: string) {
     try {
-      if (key.startsWith('self_id:')) {
-        return await getUser(key.replace('self_id:', ''));
-      } else if (key.startsWith('farcasterLink')) {
+      if (key.startsWith('farcasterLink')) {
         return await getFarcaster(key.replace('farcasterLink-', ''));
       }
     } catch (error) {

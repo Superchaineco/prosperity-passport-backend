@@ -1,5 +1,6 @@
 import { redisService } from "@/services/redis.service";
 import { BaseBadgeStrategy } from "./badgeStrategy";
+import { getAccountByAddress, setAccountNationality } from "@/services/account.service";
 
 export class SelfVerificationStrategy extends BaseBadgeStrategy {
 
@@ -8,24 +9,26 @@ export class SelfVerificationStrategy extends BaseBadgeStrategy {
 
 
         const account = extraData.account
-        const cache_key = `self_id:${account}`
-        let selfData = await redisService.getCachedData(cache_key)
-        if (!selfData && !extraData.selfUserId)
+
+        const accountData = await getAccountByAddress(account)
+        let nationality = accountData?.nationality == '' || !accountData?.nationality ? null : accountData.nationality!
+        if (!nationality && !extraData.selfUserId)
             return false
-        console.log('Self data:', selfData, 'for account:', account, ' with preid', extraData.selfUserId);
-        if (!selfData) {
+        console.log('Self data:', nationality, 'for account:', account, ' with preid', extraData.selfUserId);
+
+        if (!nationality) {
             const cache_pre_key = `self_id_pre:${extraData.selfUserId}`
             const preSelfData = await redisService.getCachedData(cache_pre_key)
             if (preSelfData) {
-                await redisService.setCachedData(cache_key, preSelfData, null);
+                setAccountNationality(account, preSelfData.nationality)
+                nationality = preSelfData.nationality
                 await redisService.deleteCachedData(cache_pre_key);
-                selfData = await redisService.getCachedData(cache_key)
+
             } else {
                 return false
             }
         }
-
-        if (selfData?.nationality?.length > 0)
+        if (nationality)
             return true
         return false
 

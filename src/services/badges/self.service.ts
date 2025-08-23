@@ -63,16 +63,7 @@ export class SelfService {
     userId: string,
     address: string
   ): Promise<SelfCheckResponse> {
-    // const selfData = await redisService.getCachedData(`self_id:${userId}`);
-    // console.log('Checking self data for userId:', userId, selfData);
-    // if (!selfData) {
-    //   return { message: 'Self data not found', check: false };
-    // }
-    // return {
-    //   message: 'Validation success!',
-    //   check: true,
-    //   data: selfData,
-    // };
+  
 
     const cache_pre_key = `self_id_pre:${userId}`;
     const cache_key = `self_id:${address}`;

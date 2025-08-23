@@ -200,3 +200,31 @@ export async function setAccountNoun(
     client.release();
   }
 }
+
+export async function setAccountNationality(
+  account: string,
+  nationality: string
+): Promise<boolean> {
+  const acc = (account ?? "").trim();
+  const nat = (nationality ?? "").trim();
+
+  if (!acc) throw new Error("account is required");
+
+  const client = await pool.connect();
+  try {
+
+    const sql = `
+  MERGE INTO public.users u
+  USING (SELECT lower($1) AS account, $2 AS nationality) s
+  ON (lower(u.account) = s.account)
+  WHEN MATCHED THEN
+    UPDATE SET nationality = s.nationality
+  WHEN NOT MATCHED THEN
+    INSERT (account, nationality) VALUES (s.account, s.nationality)
+`;
+    const { rowCount } = await client.query(sql, [acc, nat]);
+    return rowCount > 0; 
+  } finally {
+    client.release();
+  }
+}

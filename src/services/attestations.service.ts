@@ -348,8 +348,7 @@ export class AttestationsService {
     );
     const level = await superChainAccountService.getAccountLevel(account);
     const total_badges = updatedBadges.reduce((acc, badge) => acc + badge.tier, 0)
-    const badgesService = new BadgesServices();
-    const total_points = badgesService.getTotalPoints(updatedBadges);
+    const total_points = totalBadgePoints(updatedBadges)
     updateAccount(account, level, total_points, total_badges);
     console.log('Optimistic updated badges for:', account);
   }
@@ -363,5 +362,20 @@ async function updateAccount(account: string, level: number, total_points: numbe
     console.error('Error updating account stats:', error);
   }
 
+}
+
+export function totalBadgePoints(badges: any[]): number {
+  return badges.reduce((total, b) => {
+    const currTier = Number(b.tier);
+    if (!Number.isFinite(currTier)) return total;
+
+    const sumForBadge = (b.badgeTiers ?? []).reduce((acc, t) => {
+      const tierNum = Number(t.tier);
+      const pts = Number(t.points);
+      return acc + (Number.isFinite(tierNum) && tierNum <= currTier ? (Number.isFinite(pts) ? pts : 0) : 0);
+    }, 0);
+
+    return total + sumForBadge;
+  }, 0);
 }
 

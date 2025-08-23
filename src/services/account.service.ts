@@ -103,3 +103,100 @@ export async function countAccountsByEOAs(eoas: string[]): Promise<number> {
     client.release();
   }
 }
+
+function sanitizeEoas(list: unknown): string[] {
+  const arr = Array.isArray(list) ? (list as string[]) : [];
+  const lowered = arr
+    .filter((x) => typeof x === "string")
+    .map(normalizeEoaLower)
+    .filter(Boolean);
+  return Array.from(new Set(lowered)).sort();
+}
+
+
+export async function setAccountEOAs(
+  account: string,
+  eoas: string[]
+): Promise<boolean> {
+  const cleaned = sanitizeEoas(eoas);
+  const client = await pool.connect();
+  try {
+    const sql = `
+      UPDATE public.users
+      SET eoas = ARRAY(
+        SELECT DISTINCT lower(e)
+        FROM unnest($1::text[]) AS t(e)
+        ORDER BY 1
+      )
+      WHERE lower(account) = lower($2)
+    `;
+    const { rowCount } = await client.query(sql, [cleaned, account]);
+    return rowCount > 0;
+  } finally {
+    client.release();
+  }
+}
+
+export async function updateAccountStats(
+  account: string,
+  stats: { level?: number; total_points?: number; total_badges?: number }
+): Promise<boolean> {
+  const toIntOrNull = (v: unknown) =>
+    typeof v === "number" && Number.isFinite(v)
+      ? Math.floor(v)
+      : null;
+
+  const level = toIntOrNull(stats.level);
+  const total_points = toIntOrNull(stats.total_points);
+  const total_badges = toIntOrNull(stats.total_badges);
+
+  if (level === null && total_points === null && total_badges === null) {
+    return false;
+  }
+
+  const client = await pool.connect();
+  try {
+    const sql = `
+      UPDATE public.users
+      SET
+        level        = COALESCE($1::int, level),
+        total_points = COALESCE($2::int, total_points),
+        total_badges = COALESCE($3::int, total_badges)
+      WHERE lower(account) = lower($4)
+    `;
+    const { rowCount } = await client.query(sql, [
+      level,
+      total_points,
+      total_badges,
+      account,
+    ]);
+    return rowCount > 0;
+  } finally {
+    client.release();
+  }
+}
+
+
+export async function setAccountNoun(
+  account: string,
+  noun: unknown
+): Promise<boolean> {
+
+  const payload =
+    noun === null || typeof noun === "undefined"
+      ? null
+      : JSON.stringify(noun);
+
+  const client = await pool.connect();
+  try {
+    const sql = `
+      UPDATE public.users
+      SET noun = $1::jsonb
+      WHERE lower(account) = lower($2)
+    `;
+    const { rowCount } = await client.query(sql, [payload, account]);
+    return rowCount > 0;
+  } finally {
+    client.release();
+  }
+}

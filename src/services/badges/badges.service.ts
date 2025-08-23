@@ -32,7 +32,7 @@ export class BadgesServices {
     };
     const cachedData = await redisService.getCachedData(CACHE_KEY);
 
-    if (!cachedData) {
+    if (!cachedData || freshData.some(x => x.claimable)) {
       return await updateWithFresh();
     }
     return cachedData;

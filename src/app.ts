@@ -26,7 +26,7 @@ const corsOptions = {
   },
   // credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
 };
 app.use(
   cors(corsOptions)
@@ -56,7 +56,9 @@ app.use((req, res, next) => {
 // );
 
 
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  swaggerOptions: { persistAuthorization: true },
+}));
 app.get("/docs.json", (_req, res) => res.json(swaggerSpec));
 
 

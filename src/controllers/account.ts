@@ -126,6 +126,8 @@ export function requireApiKey(
  * @openapi
  * /account/by-address/{address}:
  *   get:
+ *      security:
+ *       - ApiKeyAuth: []
  *     tags: [accounts]
  *     summary: Retrieve an account by address (case-insensitive).
  *     parameters:
@@ -174,6 +176,8 @@ export async function getAccount(
  * @openapi
  * /account/by-username/{username}:
  *   get:
+ *      security:
+ *       - ApiKeyAuth: []
  *     tags: [accounts]
  *     summary: Retrieve an account by username (case-insensitive).
  *     parameters:
@@ -222,6 +226,8 @@ export async function getAccountByUsername(
  * @openapi
  * /accounts/by-eoas:
  *   post:
+ *       security:
+ *       - ApiKeyAuth: []
  *     tags: [accounts]
  *     summary: List accounts that contain at least one of the given EOAs (paginated by 100).
  *     requestBody:

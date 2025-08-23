@@ -24,17 +24,16 @@ export class BadgesServices {
   public async getCachedBadges(account: string, extraData?: any | undefined): Promise<any[]> {
     const CACHE_KEY = `cached_badges:${account}`;
 
-
-    const fetchFresh = async (): Promise<any[]> => {
-      const eoas = await superChainAccountService.getEOAS(account);
-      const freshData = await this.getBadges(eoas, account, { ...(extraData ?? {}), account });
-      await redisService.setCachedData(CACHE_KEY, freshData, null);
+    const eoas = await superChainAccountService.getEOAS(account);
+    const freshData = await this.getBadges(eoas, account, { ...(extraData ?? {}), account });
+    const updateWithFresh = async (): Promise<any[]> => {
+      await redisService.setCachedData(CACHE_KEY, freshData, 60 * 5);
       return freshData;
     };
     const cachedData = await redisService.getCachedData(CACHE_KEY);
 
     if (!cachedData) {
-      return await fetchFresh();
+      return await updateWithFresh();
     }
     return cachedData;
 

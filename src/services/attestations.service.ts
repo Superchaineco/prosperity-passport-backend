@@ -121,7 +121,7 @@ export class AttestationsService {
     }
   }
 
-    async createSafeTransactions(txDatas: any[]) {
+  async createSafeTransactions(txDatas: any[]) {
     const safeTransactions: MetaTransactionData[] = [];
     for (const txData of txDatas) {
       const data = this.eas.interface.encodeFunctionData('attest', [txData]);
@@ -183,6 +183,21 @@ export class AttestationsService {
       });
     }
 
+    const preResponses = await Promise.all(
+      batchData.map(async (data) => {
+        const isLevelUp = await superChainAccountService.getIsLevelUp(
+          data.account,
+          data.totalPoints
+        );
+
+        return {
+          data,
+          isLevelUp
+        };
+      })
+    );
+
+
     const safeTransactions = await this.createSafeTransactions(txDatas);
 
     const safeTransaction = await safeSdk.createTransaction({
@@ -201,6 +216,25 @@ export class AttestationsService {
 
       await this.provider.waitForTransaction(executeTxResponse.hash, 1);
 
+      const responses = await Promise.all(
+        preResponses.map(async (data) => {
+
+
+          const updatedBadges = data.data.badges.filter((badge) =>
+            data.data.badgeUpdates.some((update) => update.badgeId === badge.badgeId)
+          );
+
+          return {
+            account: data.data.account,
+            hash: executeTxResponse.hash,
+            isLevelUp: data.isLevelUp,
+            totalPoints: data.data.totalPoints,
+            badgeUpdates: data.data.badgeUpdates,
+            updatedBadges,
+          };
+        })
+      );
+
       await Promise.all(
         batchData.map(
           async (data) =>
@@ -209,28 +243,6 @@ export class AttestationsService {
               data.badgeUpdates
             )
         )
-      );
-
-      const responses = await Promise.all(
-        batchData.map(async (data) => {
-          const isLevelUp = await superChainAccountService.getIsLevelUp(
-            data.account,
-            data.totalPoints
-          );
-
-          const updatedBadges = data.badges.filter((badge) =>
-            data.badgeUpdates.some((update) => update.badgeId === badge.badgeId)
-          );
-
-          return {
-            account: data.account,
-            hash: executeTxResponse.hash,
-            isLevelUp,
-            totalPoints: data.totalPoints,
-            badgeUpdates: data.badgeUpdates,
-            updatedBadges,
-          };
-        })
       );
 
       return responses;
@@ -301,12 +313,15 @@ export class AttestationsService {
     }
   }
 
+
+
+
   public async claimBadgesOptimistically(
     account: string,
     badgeUpdates: { badgeId: number; level: number; points: number }[]
   ): Promise<void> {
     const CACHE_KEY = `cached_badges:${account}`;
-    const OPTIMISTIC_UPDATED_CACHE_KEY = `optimistic_updated_cached_badges:${account}`;
+    // const OPTIMISTIC_UPDATED_CACHE_KEY = `optimistic_updated_cached_badges:${account}`;
 
     const existingData = await redisService.getCachedData(CACHE_KEY);
     if (!existingData) {
@@ -324,9 +339,9 @@ export class AttestationsService {
       return badge;
     });
 
-    // 3. Guardar la versión optimista
+
     await redisService.setCachedData(
-      OPTIMISTIC_UPDATED_CACHE_KEY,
+      CACHE_KEY,
       updatedBadges,
       null
     );

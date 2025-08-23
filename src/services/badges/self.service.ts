@@ -74,8 +74,10 @@ export class SelfService {
     console.log('Checking self data for userId:', userId, selfData);
     console.log(selfData != null);
     if (selfData != null && Object.keys(selfData).length > 0) {
+      console.log('Validation success!:', userId, selfData);
       return { message: 'Validation success!', check: true, data: selfData };
     }
+    console.log('Self data not found!:', userId, selfData);
     return { message: 'Self data not found', check: false };
   }
 }

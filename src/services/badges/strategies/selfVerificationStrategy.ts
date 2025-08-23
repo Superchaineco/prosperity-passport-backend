@@ -11,10 +11,12 @@ export class SelfVerificationStrategy extends BaseBadgeStrategy {
         const account = extraData.account
 
         const accountData = await getAccountByAddress(account)
-        let nationality = accountData?.nationality == '' || !accountData?.nationality ? null : accountData.nationality!
+        let nationality = accountData?.nationality
+
+        console.log('Self data for ', account, ' nat: ', nationality, ' with preid', extraData.selfUserId);
         if (!nationality && !extraData.selfUserId)
             return false
-        console.log('Self data:', nationality, 'for account:', account, ' with preid', extraData.selfUserId);
+
 
         if (!nationality) {
             const cache_pre_key = `self_id_pre:${extraData.selfUserId}`
@@ -28,7 +30,7 @@ export class SelfVerificationStrategy extends BaseBadgeStrategy {
                 return false
             }
         }
-        if (nationality)
+        if (nationality != null && nationality != '')
             return true
         return false
 

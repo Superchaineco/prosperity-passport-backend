@@ -19,7 +19,7 @@ import SafeApiKit from '@safe-global/api-kit';
 import Safe4337Pack from '@safe-global/relay-kit/dist/src/packs/safe-4337/Safe4337Pack';
 import { MetaTransactionData, OperationType } from '@safe-global/types-kit';
 import config from '@/config';
-import { updateAccountStats } from './account.service';
+import { setAccountEOAs, setAccountNoun, updateAccountStats } from './account.service';
 
 export class AttestationsService {
   private easContractAddress = EAS_CONTRACT_ADDRESS;
@@ -346,14 +346,31 @@ export class AttestationsService {
       updatedBadges,
       null
     );
+
+
     const level = await superChainAccountService.getAccountLevel(account);
     const total_badges = updatedBadges.reduce((acc, badge) => acc + badge.tier, 0)
     const total_points = totalBadgePoints(updatedBadges)
     updateAccount(account, level, total_points, total_badges);
+    const eoas = await superChainAccountService.getEOAS(account)
+    const accountData = await superChainAccountService.getSuperChainSmartAccount(account)
+    const noun = getAvatarNoun(accountData)
+    setAccountNoun(account, noun);
+    setAccountEOAs(account, eoas)
     console.log('Optimistic updated badges for:', account);
   }
 }
 
+
+function getAvatarNoun(superchainsmartaccount: any) {
+  return {
+    background: parseInt(superchainsmartaccount[4][0]),
+    body: parseInt(superchainsmartaccount[4][1]),
+    accessory: parseInt(superchainsmartaccount[4][2]),
+    head: parseInt(superchainsmartaccount[4][3]),
+    glasses: parseInt(superchainsmartaccount[4][4]),
+  }
+}
 
 async function updateAccount(account: string, level: number, total_points: number, total_badges: number) {
   try {

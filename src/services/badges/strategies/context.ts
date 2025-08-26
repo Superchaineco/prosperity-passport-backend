@@ -53,7 +53,7 @@ export class BadgeStrategyContext {
         return new GlodollarStrategy()
       case "ReFi DAO Contributor":
         return new ReFiDaoMemberStrategy()
-      case "Community Guild":
+      case "Community Guild Lead":
         return new CeloCommunityGuildStrategy()
       case "Governance Guardian":
         return new CeloGovernanceGuardianStrategy()

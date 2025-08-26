@@ -23,6 +23,7 @@ import { ProofOfShipStrategy } from './proofOfShipStrategy';
 import { ReFiDaoMemberStrategy } from './refiDaoMemberStrategy';
 import { SelfVerificationStrategy } from './selfVerificationStrategy';
 import { TalentScoreStrategy } from './talentScoreStrategy';
+import { TDFContributorStrategy } from './tdfContributorStrategy';
 
 
 
@@ -76,6 +77,8 @@ export class BadgeStrategyContext {
         return new CeloSeasonedTransactionsStrategy("S1")
       case "S0 Gov Contributor":
         return new GovContributorStrategy("S0")
+      case "TDF Contributor":
+        return new TDFContributorStrategy()
       default:
         throw new Error(`Badge strategy ${badgeName} not found`);
     }

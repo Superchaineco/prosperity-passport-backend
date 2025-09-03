@@ -50,6 +50,28 @@ export async function getAccountByUsername(username: string): Promise<AccountRec
 }
 
 
+export async function getAccounts(): Promise<AccountRecord[]> {
+  const client = await pool.connect();
+  try {
+    const sql = `
+      SELECT account,
+             nationality,
+             username,
+             eoas,
+             level,
+             noun,
+             total_points,
+             total_badges
+      FROM users
+      ORDER BY username ASC
+    `;
+    const { rows } = await client.query<AccountRecord>(sql);
+    return rows;
+  } finally {
+    client.release();
+  }
+}
+
 function normalizeEoaLower(input: string): string {
   const s: string = (input ?? "").trim().toLowerCase();
   return s.startsWith("0x") ? s : `0x${s}`;

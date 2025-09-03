@@ -5,34 +5,35 @@ import {
     type AccountRecord,
     listAccountsByEOAs,
     countAccountsByEOAs,
+    getAccounts,
 } from "@/services/account.service";
 import type { Request, Response } from "express";
 
 
 
 const EXPECTED_API_KEY =
-  process.env.ACCOUNTS_API_KEY 
+    process.env.ACCOUNTS_API_KEY
 
 export function requireApiKey(
-  req: Request,
-  res: Response,
-  next: () => void
+    req: Request,
+    res: Response,
+    next: () => void
 ): void {
-  if (!EXPECTED_API_KEY) {
-    // Si no hay key configurada en el server, mejor fallar explícitamente
-    res.status(500).json({ error: "API key not configured on server" });
-    return;
-  }
-  const provided = req.header("x-api-key");
-  if (!provided) {
-    res.status(401).json({ error: "Missing x-api-key" });
-    return;
-  }
-  if (provided !== EXPECTED_API_KEY) {
-    res.status(403).json({ error: "Invalid API key" });
-    return;
-  }
-  next();
+    if (!EXPECTED_API_KEY) {
+        // Si no hay key configurada en el server, mejor fallar explícitamente
+        res.status(500).json({ error: "API key not configured on server" });
+        return;
+    }
+    const provided = req.header("x-api-key");
+    if (!provided) {
+        res.status(401).json({ error: "Missing x-api-key" });
+        return;
+    }
+    if (provided !== EXPECTED_API_KEY) {
+        res.status(403).json({ error: "Invalid API key" });
+        return;
+    }
+    next();
 }
 /**
  * @openapi
@@ -222,6 +223,48 @@ export async function getAccountByUsername(
     const row = await repoGetByUsername(username);
     row ? res.status(200).json(row) : res.status(404).json({ error: "account not found" });
 }
+
+
+
+
+/**
+ * @openapi
+ * /accounts:
+ *   get:
+ *     tags:
+ *       - accounts
+ *     summary: Retrieve all accounts.
+ *     security:
+ *       - ApiKeyAuth: []
+ *     responses:
+ *       '200':
+ *         description: List of accounts retrieved successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/AccountRecord'
+ *       '500':
+ *         description: Server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+
+export async function getAllAccounts(
+    req: Request,
+    res: Response<AccountRecord[] | { error: string }>
+): Promise<void> {
+    try {
+        const rows = await getAccounts();
+        res.status(200).json(rows);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message ?? "internal server error" });
+    }
+}
+
 
 
 /**

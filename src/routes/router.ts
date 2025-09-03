@@ -65,7 +65,7 @@ routes.use('/rpc', verifyInternalRequest, rpcReverseProxy);
 routes.use('/account/by-address/:address', requireApiKey, getAccount);
 
 routes.use('/account/by-username/:username', requireApiKey, getAccountByUsername);
-routes.use('/accounts/all', requireApiKey, getAllAccounts);
+routes.use('/accounts', requireApiKey, getAllAccounts);
 
 routes.post("/accounts/by-eoas", requireApiKey, postAccountsByEOAs);
 

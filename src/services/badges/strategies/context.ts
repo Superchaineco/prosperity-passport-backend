@@ -2,6 +2,7 @@
 import { BadgeStrategy } from './badgeStrategy';
 import { Celo2TransactionsStrategy } from './celo2TransactionsStrategy';
 import { CeloCitizenStrategy } from './celoCitizenStrategy';
+import { CeloCommunityGuildMemberStrategy } from './celoCommunityGuildMemberStrategy';
 import { CeloCommunityGuildStrategy } from './celoCommunityGuildStrategy';
 import { CeloEventsPoapStrategy } from './celoEventsPoapStrategy';
 import { CeloGenesisStrategy } from './celoGenesisStrategy';
@@ -79,6 +80,8 @@ export class BadgeStrategyContext {
         return new GovContributorStrategy("S0")
       case "TDF Contributor":
         return new TDFContributorStrategy()
+      case "Community Guild Member":
+        return new CeloCommunityGuildMemberStrategy()
       default:
         throw new Error(`Badge strategy ${badgeName} not found`);
     }

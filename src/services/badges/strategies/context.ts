@@ -44,14 +44,14 @@ export class BadgeStrategyContext {
         return new GitcoinDonationsStrategy()
       case "Talent Protocol Score":
         return new TalentScoreStrategy()
-      case "Celo Voter":
-        return new CeloVotesStrategy()
+      // case "Celo Voter":
+      //   return new CeloVotesStrategy()
       case "CeloPG Steward":
         return new CeloStewardsStrategy()
       case "Regional DAO Lead":
         return new CeloRegionalLeadStrategy()
-      case "USD GLO tiers":
-        return new GlodollarStrategy()
+      // case "USD GLO tiers":
+      //   return new GlodollarStrategy()
       case "ReFi DAO Contributor":
         return new ReFiDaoMemberStrategy()
       case "Community Guild Lead":

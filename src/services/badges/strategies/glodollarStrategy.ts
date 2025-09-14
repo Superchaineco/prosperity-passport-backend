@@ -6,7 +6,7 @@ export class GlodollarStrategy extends BaseBadgeStrategy {
   dune = new DuneClient(process.env.DUNE_API_KEY!);
 
   async getValue(eoas: string[]): Promise<number> {
-    try {
+   
       const cacheKey = `glodollar-${eoas.join(',')}`;
       const ttl = 3600;
 
@@ -20,10 +20,7 @@ export class GlodollarStrategy extends BaseBadgeStrategy {
       };
 
       return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, ttl);
-    } catch (error) {
-      console.log('Error fetching GloDollar data from Dune:', error);
-      return 0;
-    }
+    
 
   }
 }

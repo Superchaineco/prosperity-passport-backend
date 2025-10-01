@@ -3,6 +3,7 @@ import { redisService } from '../../redis.service';
 import { Pool } from 'pg';
 import { formatUnits, parseUnits } from 'ethers';
 import { DATABASE_URL } from '@/config/superChain/constants';
+import { Badge } from '../badges.service';
 
 interface Threshold {
   amount: bigint;
@@ -22,6 +23,8 @@ export class VaultsStrategy extends BaseBadgeStrategy {
 
   async getValue(
     eoas: string[],
+    badgeData: Badge,
+    extraData: any | undefined,
     account: string,
     enableLogs: boolean = false
   ): Promise<number> {

@@ -14,34 +14,37 @@ export type ResponseBadge = {
   points: string;
   tier: string;
 } & Badge['badge'] & {
-  claimableTier: number | null;
-  claimable: boolean;
-};
+    claimableTier: number | null;
+    claimable: boolean;
+  };
 
 export class BadgesServices {
   private badges: ResponseBadge[] = [];
 
-  public async getCachedBadges(account: string, extraData?: any | undefined): Promise<any[]> {
+  public async getCachedBadges(
+    account: string,
+    extraData?: any | undefined
+  ): Promise<any[]> {
     const CACHE_KEY = `cached_badges:${account}`;
 
     const eoas = await superChainAccountService.getEOAS(account);
-    const freshData = await this.getBadges(eoas, account, { ...(extraData ?? {}), account });
+    const freshData = await this.getBadges(eoas, account, {
+      ...(extraData ?? {}),
+      account,
+    });
     const updateWithFresh = async (): Promise<any[]> => {
       await redisService.setCachedData(CACHE_KEY, freshData, 60 * 5);
       return freshData;
     };
     const cachedData = await redisService.getCachedData(CACHE_KEY);
 
-    if (!cachedData || freshData.some(x => x.claimable)) {
+    if (!cachedData || freshData.some((x) => x.claimable)) {
       return await updateWithFresh();
     }
     return cachedData;
-
   }
 
-
   public async fetchBadges(account: string) {
-
     const fetchFunction = async () => {
       const { data, errors }: ExecutionResult<GetUserBadgesQuery> =
         await execute(GetUserBadgesDocument, {
@@ -58,7 +61,11 @@ export class BadgesServices {
     return fetchFunction();
   }
 
-  public async getBadges(eoas: string[], account: string, extraData: any | undefined): Promise<any[]> {
+  public async getBadges(
+    eoas: string[],
+    account: string,
+    extraData: any | undefined
+  ): Promise<any[]> {
     const data = await this.fetchBadges(account);
 
     const accountBadgesIds =
@@ -78,12 +85,11 @@ export class BadgesServices {
 
     const activeBadges = [
       ...(data?.accountBadges ?? []).map((badge) => {
-
-        return ({
+        return {
           ...badge,
           tier: parseInt(badge.tier),
           points: parseInt(badge.points),
-        })
+        };
       }),
       ...unclaimedBadges,
     ] as Badge[];
@@ -103,7 +109,7 @@ export class BadgesServices {
     }
 
     for (const badge of activeBadges) {
-      await this.updateBadgeDataForAccount(eoas, badge, extraData);
+      await this.updateBadgeDataForAccount(eoas, badge, extraData, account);
     }
 
     return this.badges;
@@ -143,7 +149,9 @@ export class BadgesServices {
       .map((badge) => ({
         badgeId: badge.badgeId,
         level: badge.claimableTier!,
-        points: Number(badge.badgeTiers.find(x => x.tier == badge.claimableTier!).points),
+        points: Number(
+          badge.badgeTiers.find((x) => x.tier == badge.claimableTier!).points
+        ),
         previousLevel: badge.tier,
       }));
   }
@@ -202,13 +210,18 @@ export class BadgesServices {
   private async updateBadgeDataForAccount(
     eoas: string[],
     badgeData: Badge,
-    extraData: any | undefined
+    extraData: any | undefined,
+    account: string
   ) {
     try {
-      const strategy = BadgeStrategyContext.getBadgeStrategy(badgeData.badge.metadata!.name);
+      const strategy = BadgeStrategyContext.getBadgeStrategy(
+        badgeData.badge.metadata!.name
+      );
       const badgeResponse = await strategy.calculateTier(
         eoas,
-        badgeData, extraData
+        badgeData,
+        extraData,
+        account
       );
       this.badges.push(badgeResponse);
     } catch (error) {

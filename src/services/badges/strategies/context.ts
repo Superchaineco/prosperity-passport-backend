@@ -25,6 +25,7 @@ import { ReFiDaoMemberStrategy } from './refiDaoMemberStrategy';
 import { SelfVerificationStrategy } from './selfVerificationStrategy';
 import { TalentScoreStrategy } from './talentScoreStrategy';
 import { TDFContributorStrategy } from './tdfContributorStrategy';
+import { VaultsStrategy } from './vaultStrategy';
 
 
 
@@ -82,6 +83,8 @@ export class BadgeStrategyContext {
         return new TDFContributorStrategy()
       case "Community Guild Member":
         return new CeloCommunityGuildMemberStrategy()
+      case "Celo Vault Deposit":
+        return new VaultsStrategy()
       default:
         throw new Error(`Badge strategy ${badgeName} not found`);
     }

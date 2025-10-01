@@ -78,3 +78,4 @@ export const AIRDROP_ADDRESS = process.env.AIRDROP_ADDRESS!;
 export const AIRDROP_ABI = AirdropABI;
 export const RPC_PROVIDER = process.env.RPC_PROVIDER
 export const BADGES_RPC_URL = process.env.BADGES_RPC_URL
+export const DATABASE_URL = process.env.DATABASE_URL;

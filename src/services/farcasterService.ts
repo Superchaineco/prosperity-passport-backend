@@ -44,7 +44,7 @@ export async function createFarcaster({ account, fid, signature }: Farcaster): P
     } catch (err) {
         await client.query('ROLLBACK')
         console.error('Error inserting user:', err)
-        throw err
+        
     } finally {
         client.release()
     }

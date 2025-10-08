@@ -344,7 +344,7 @@ export class AttestationsService {
     await redisService.setCachedData(
       CACHE_KEY,
       updatedBadges,
-      null
+      60
     );
 
 

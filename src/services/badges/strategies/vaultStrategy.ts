@@ -14,7 +14,7 @@ export class VaultsStrategy extends BaseBadgeStrategy {
   private pool: Pool;
 
   constructor() {
-    super();    
+    super();
     this.pool = new Pool({
       connectionString: DATABASE_URL,
     });
@@ -22,9 +22,8 @@ export class VaultsStrategy extends BaseBadgeStrategy {
 
   async getValue(
     eoas: string[],
-    badgeData: Badge,
     extraData: any | undefined,
-    account: string,
+    badgeData: Badge,
     enableLogs: boolean = false
   ): Promise<number> {
     const activeThresholds: Threshold[] = [
@@ -34,7 +33,7 @@ export class VaultsStrategy extends BaseBadgeStrategy {
       { amount: parseUnits('10000', 18), duration: 7 * 24 * 3600 * 1000 }, // 10000 CELO for 7 days
       { amount: parseUnits('10000', 18), duration: 28 * 24 * 3600 * 1000 }, // 10000 CELO for 28 days
     ];
-
+    const { account } = extraData
     const cacheKey = `vaults_transactions-${account}`;
     const ttl = 3600; // 1 hora
 
@@ -45,7 +44,7 @@ export class VaultsStrategy extends BaseBadgeStrategy {
         const result = await client.query(query, [account]);
         const transactions = result.rows;
 
-        const log = enableLogs ? console.log : () => {};
+        const log = enableLogs ? console.log : () => { };
 
         log(
           `Processing ${transactions.length} transactions for account ${account}`

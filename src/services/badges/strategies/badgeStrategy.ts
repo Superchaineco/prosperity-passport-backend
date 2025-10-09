@@ -10,10 +10,9 @@ export interface BadgeStrategy {
 
 export abstract class BaseBadgeStrategy implements BadgeStrategy {
   abstract getValue(
-    eoas: string[],
-    badgeData: Badge,
+    eoas: string[],  
     extraData: any | undefined,
-    account?: string,
+    badgeData: Badge   
   ): Promise<number | boolean>;
 
   protected isDecending = false;
@@ -24,7 +23,7 @@ export abstract class BaseBadgeStrategy implements BadgeStrategy {
     extraData: any | undefined,
     account: string
   ): Promise<ResponseBadge> {
-    const value = await this.getValue(eoas,badgeData, extraData, account);
+    const value = await this.getValue(eoas, extraData,badgeData);
 
     let claimableTier: number | null = null;
     let claimable = false;

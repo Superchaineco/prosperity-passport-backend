@@ -53,6 +53,6 @@ export async function getAssetPrice(assetAddress: string): Promise<number> {
     }
   };
 
-  const cacheKey = `asset_priceaa_${assetAddress}`;
-  return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, 1);
+  const cacheKey = `asset_price_${assetAddress}`;
+  return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, 3600);
 }

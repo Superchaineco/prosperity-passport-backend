@@ -5,8 +5,9 @@ import { COINGECKO_API_KEY } from '@/config/superChain/constants';
 export async function getAssetPrice(assetAddress: string): Promise<number> {
   const fetchFunction = async () => {
     try {
+      // Primero intentamos con Coingecko
       const response = await axios.get(
-        `https://api.coingecko.com/api/v3/simple/token_price/celo?contract_addresses=${assetAddress}&vs_currencies=usd`,
+        `https://api.coingecko.com/api/v3/simple/token_price/celo?contract_addresses=${assetAddress.toLowerCase()}&vs_currencies=usd`,
         {
           headers: {
             accept: 'application/json',
@@ -15,15 +16,38 @@ export async function getAssetPrice(assetAddress: string): Promise<number> {
         }
       );
 
-      const priceData = response.data[assetAddress.toLowerCase()];
+      const priceData = response.data.find((asset) => asset === assetAddress);
 
-      if (!priceData && !priceData.usd || priceData.usd === 0) {
-        throw new Error('Price data not found');
+      console.debug('Price Data from Coingecko:', priceData);
+      console.debug('Asset Address:', assetAddress);
+
+      if (!priceData) {
+        const response = await axios.get(
+          `https://api.geckoterminal.com/api/v2/simple/networks/celo/token_price/${assetAddress}`,
+          {
+            headers: {
+              accept: 'application/json',
+            },
+          }
+        );
+
+        console.debug({ response });
+
+        const geckoData =
+          response.data.data.attributes.token_prices[
+            assetAddress.toLowerCase()
+          ];
+
+        console.debug('Price Data from GeckoTerminal:', geckoData);
+
+        return parseFloat(geckoData);
       }
       return priceData.usd;
     } catch (error) {
-      console.error(error);
-      throw new Error('Failed to fetch asset price');
+      console.error('Error fetching price:', error);
+      throw new Error(
+        'Failed to fetch asset price from both Coingecko and GeckoTerminal'
+      );
     }
   };
 

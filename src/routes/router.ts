@@ -17,14 +17,17 @@ import { getVaults, refreshVaults } from '@/controllers/vaults';
 import { verifyFarcaster } from '@/controllers/farcaster';
 import { getAirdrop, postAirdrop } from '@/controllers/airdrop';
 import { rpcReverseProxy, verifyInternalRequest } from '@/controllers/rpcProxy';
-import { getAccount, getAccountByUsername, getAllAccounts, postAccountsByEOAs, requireApiKey } from '@/controllers/account';
+import {
+  getAccount,
+  getAccountByUsername,
+  getAllAccounts,
+  postAccountsByEOAs,
+  requireApiKey,
+} from '@/controllers/account';
 import { postBackfillEOAsAll } from '@/controllers/fetchEOAS';
-
-
-
+import { getAsset } from '@/controllers/assets';
 
 export const routes = Router();
-
 
 routes.get('/user/:account', getUser);
 
@@ -48,6 +51,8 @@ routes.get('/vaults/:account', getVaults);
 
 routes.post('/vaults/:account/refresh', refreshVaults);
 
+routes.get('/assets/:asset/price', getAsset);
+
 routes.post('/relay', relay);
 
 routes.post('/self/verify', selfVerify);
@@ -64,10 +69,14 @@ routes.use('/rpc', verifyInternalRequest, rpcReverseProxy);
 
 routes.use('/account/by-address/:address', requireApiKey, getAccount);
 
-routes.use('/account/by-username/:username', requireApiKey, getAccountByUsername);
+routes.use(
+  '/account/by-username/:username',
+  requireApiKey,
+  getAccountByUsername
+);
 routes.use('/accounts', requireApiKey, getAllAccounts);
 
-routes.post("/accounts/by-eoas", requireApiKey, postAccountsByEOAs);
+routes.post('/accounts/by-eoas', requireApiKey, postAccountsByEOAs);
 
 //routes.post("/admin/backfill-eoas-all", postBackfillEOAsAll);
 

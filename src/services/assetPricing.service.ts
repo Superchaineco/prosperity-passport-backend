@@ -16,12 +16,14 @@ export async function getAssetPrice(assetAddress: string): Promise<number> {
         }
       );
 
-      const priceData = response.data.find((asset) => asset === assetAddress);
+
+      const priceData = response.data[assetAddress.toLowerCase()];
+
 
       console.debug('Price Data from Coingecko:', priceData);
       console.debug('Asset Address:', assetAddress);
 
-      if (!priceData) {
+      if (!priceData.usd) {
         const response = await axios.get(
           `https://api.geckoterminal.com/api/v2/simple/networks/celo/token_price/${assetAddress}`,
           {
@@ -51,6 +53,6 @@ export async function getAssetPrice(assetAddress: string): Promise<number> {
     }
   };
 
-  const cacheKey = `asset_price_${assetAddress}`;
-  return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, 3600);
+  const cacheKey = `asset_priceaa_${assetAddress}`;
+  return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, 1);
 }

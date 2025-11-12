@@ -25,7 +25,7 @@ import {
   requireApiKey,
 } from '@/controllers/account';
 import { postBackfillEOAsAll } from '@/controllers/fetchEOAS';
-import { getAsset } from '@/controllers/assets';
+import { getAsset, getAssets } from '@/controllers/assets';
 
 export const routes = Router();
 
@@ -52,6 +52,8 @@ routes.get('/vaults/:account', getVaults);
 routes.post('/vaults/:account/refresh', refreshVaults);
 
 routes.get('/assets/:asset/price', getAsset);
+
+routes.get('/assets/:assets/prices', getAssets);
 
 routes.post('/relay', relay);
 

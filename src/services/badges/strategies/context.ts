@@ -1,4 +1,5 @@
-import { AkibaMilesStrategy } from './AkibaMilesStrategy';
+import { AkibaGames } from './akibaGames';
+import { AkibaMilesStrategy } from './akibaMilesStrategy';
 import { BadgeStrategy } from './badgeStrategy';
 import { Celo2TransactionsStrategy } from './celo2TransactionsStrategy';
 import { CeloCitizenStrategy } from './celoCitizenStrategy';
@@ -86,6 +87,8 @@ export class BadgeStrategyContext {
         return new VaultsStrategy();
       case 'AkibaMiles Earner':
         return new AkibaMilesStrategy();
+         case 'AkibaMiles earned from Games':
+        return new AkibaGames();
       case 'CELO Merkl Yielder':
         return new CeloMerklStrategy();
       case 'cUSD Merkl Yielder':

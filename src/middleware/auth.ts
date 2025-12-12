@@ -11,13 +11,13 @@ export async function verifyOwner(req: Request, res: Response, next: NextFunctio
 
     try {
 
-
-        const { address } = verifySession(req);
-
-        const account = req.params.account as string;
         if (req.headers['x-api-key'] == process.env.INTERNAL_API_KEY) {
             return next();
         }
+        const { address } = verifySession(req);
+
+        const account = req.params.account as string;
+
         if (!account) {
             return res.status(400).json({ message: "Invalid request, account is missing" });
         }

@@ -87,7 +87,7 @@ export class BadgeStrategyContext {
         return new VaultsStrategy();
       case 'AkibaMiles Earner':
         return new AkibaMilesStrategy();
-         case 'AkibaMiles earned from Games':
+         case 'AkibaMiles Game Earner':
         return new AkibaGames();
       case 'CELO Merkl Yielder':
         return new CeloMerklStrategy();

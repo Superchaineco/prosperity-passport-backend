@@ -10,10 +10,14 @@ export async function verifyOwner(req: Request, res: Response, next: NextFunctio
     }
 
     try {
+
+
         const { address } = verifySession(req);
 
         const account = req.params.account as string;
-
+        if (req.headers['x-api-key'] == process.env.INTERNAL_API_KEY) {
+            return next();
+        }
         if (!account) {
             return res.status(400).json({ message: "Invalid request, account is missing" });
         }
@@ -69,16 +73,16 @@ export async function verifyReverseProxy(req: Request, res: Response, next: Next
 // }
 
 function verifySession(req: Request) {
-  const auth = req.headers.authorization;
-  if (!auth?.startsWith("Bearer ")) {
-    console.log("Invalid Authorization header format: ", auth);
-    throw new Error("Unauthorized - Invalid Authorization header format");
-  }
+    const auth = req.headers.authorization;
+    if (!auth?.startsWith("Bearer ")) {
+        console.log("Invalid Authorization header format: ", auth);
+        throw new Error("Unauthorized - Invalid Authorization header format");
+    }
 
-  const token = auth.slice(7);
-  const payload = verifyJwt(token) as { address: string; chainId: number };
+    const token = auth.slice(7);
+    const payload = verifyJwt(token) as { address: string; chainId: number };
 
-  if (!payload.address) throw new Error("Unauthorized - Address not found in token payload");
+    if (!payload.address) throw new Error("Unauthorized - Address not found in token payload");
 
-  return payload;
+    return payload;
 }

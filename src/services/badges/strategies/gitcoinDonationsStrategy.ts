@@ -1,42 +1,43 @@
-import { BaseBadgeStrategy } from "./badgeStrategy";
-import { redisService } from "../../redis.service";
+import { BaseBadgeStrategy } from './badgeStrategy';
+import { redisService } from '../../redis.service';
+import axios from 'axios';
 
 export class GitcoinDonationsStrategy extends BaseBadgeStrategy {
+  async getValue(eoas: string[]): Promise<number> {
+    const cacheKey = `gitcoinDonationss-${eoas.join(',')}`;
+    const ttl = 60;
 
-
-    async getValue(eoas: string[]): Promise<number> {
-        const cacheKey = `gitcoinDonations-${eoas.join(",")}`;
-        const ttl = 3600;
-
-
-        const fetchFunction = async () => {
-            const gitcoinIndexerUrl =
-                "https://grants-stack-indexer-v2.gitcoin.co/graphql";
-            const gitcoinDonationsQuery = `query getGitcoinDonations($fromWalletAddresses: [String!]) {
-    donations(filter: {  chainId: { equalTo: 42220 }, donorAddress: {in: $fromWalletAddresses}}) {
+    const fetchFunction = async () => {
+      const gitcoinIndexerUrl =
+        'https://indexer.grantsstack.giveth.io/v1/graphql';
+      const gitcoinDonationsQuery = `query getGitcoinDonations($fromWalletAddresses: [String!]) {
+     donations(where: {  chainId: { _eq: 42220 }, donorAddress: {_in: $fromWalletAddresses}}) {
       amountInUsd
       chainId
     }
   }`;
 
-            try {
-                const res = await fetch(gitcoinIndexerUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        query: gitcoinDonationsQuery,
-                        variables: { fromWalletAddresses: [...eoas.map(eoa => eoa.toLowerCase())] },
-                    }),
-                }).then((r) => r.json());
+      try {
+        const res = await axios.post(
+          gitcoinIndexerUrl,
+          {
+            query: gitcoinDonationsQuery,
+            variables: {
+              fromWalletAddresses: [...eoas.map((eoa) => eoa.toLowerCase())],
+            },
+          },
+          { headers: { 'Content-Type': 'application/json' } }
+        );
 
-                console.debug({ res });
-                const donations: { amountInUsd: number }[] = res.data?.donations || [];
-                return donations.reduce((sum, d) => sum + d.amountInUsd, 0);
-            } catch (error) {
-                return 0;
-            }
-        };
+        // GraphQL responses put data under res.data.data
+        const donations: { amountInUsd: number }[] = res.data?.data?.donations || [];
+        return donations.reduce((sum, d) => sum + (d.amountInUsd || 0), 0);
+      } catch (error) {
+        console.debug('Gitcoin donations query error', error);
+        return 0;
+      }
+    };
 
-        return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, ttl);
-    }
+    return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, ttl);
+  }
 }

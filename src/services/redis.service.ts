@@ -2,6 +2,22 @@ import { redis, redisClient } from '../utils/cache';
 import { createFarcaster, getFarcaster } from './farcasterService';
 
 export class RedisService {
+
+  private getDefaultValue<T>(): T {
+    // NOTE: Runtime heuristic – TypeScript generics are erased
+    const typeProbe: unknown = undefined as unknown as T;
+
+    if (typeof typeProbe === 'number') {
+      return 0 as T;
+    }
+
+    if (typeof typeProbe === 'string') {
+      return '' as T;
+    }
+
+    return undefined as unknown as T;
+  }
+
   public async getCachedDataWithCallback<T>(
     key: string,
     fetchFunction: () => Promise<T>,
@@ -24,7 +40,7 @@ export class RedisService {
       return data;
     } catch (error) {
       console.error('Error getting cached data', error);
-      throw error;
+      return this.getDefaultValue<T>();
     }
   }
 

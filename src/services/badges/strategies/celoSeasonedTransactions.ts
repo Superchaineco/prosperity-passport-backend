@@ -1,7 +1,6 @@
 import { redisService } from "@/services/redis.service";
-import axios from "axios";
 import { BaseBadgeStrategy } from "./badgeStrategy";
-import { BLOCKSCOUT_API_KEY } from "@/config/superChain/constants";
+import { Network } from "alchemy-sdk";
 
 type Season = {
     code: string;
@@ -23,7 +22,7 @@ const Seasons: Season[] = [
 ];
 export class CeloSeasonedTransactionsStrategy extends BaseBadgeStrategy {
     private season: Season;
-   
+
 
     constructor(seasonCode: string) {
         super();
@@ -31,7 +30,7 @@ export class CeloSeasonedTransactionsStrategy extends BaseBadgeStrategy {
         if (!this.season) {
             throw new Error(`Season code "${seasonCode}" not found`);
         }
-       
+
     }
 
     async getValue(eoas: string[]): Promise<number> {
@@ -39,17 +38,7 @@ export class CeloSeasonedTransactionsStrategy extends BaseBadgeStrategy {
         const ttl = 3600;
 
         const fetchFunction = async () => {
-            const total = await eoas.reduce(async (accPromise, eoa) => {
-                const response = await axios.get(
-                    `https://celo.blockscout.com/api?module=account&action=txlist&address=${eoa}&sort=asc&startblock=${this.season.startBlock}&endblock=${this.season.endBlock}&apikey=${BLOCKSCOUT_API_KEY}`
-                );
-                const count = response.data.result.filter(
-                    (tx: any) => tx.from.toLowerCase() === eoa.toLowerCase()
-                ).length;
-                return (await accPromise) + count;
-            }, Promise.resolve(0));
-
-            return total;
+            return await this.getAlchemyTransactionsCount("celo", Network.CELO_MAINNET, eoas, this.season.code, this.season.startBlock, this.season.endBlock);
         };
 
         return redisService.getCachedDataWithCallback(cacheKey, fetchFunction, ttl);
